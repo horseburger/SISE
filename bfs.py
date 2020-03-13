@@ -3,6 +3,9 @@ import numpy as np
 
 class BFS(Strategy):
 
+    def __init__(self, search_order):
+        Strategy.__init__(self, search_order=search_order)
+
     def start(self):
         if not self.model.is_solved():
             print(self.model.current_state)
@@ -56,5 +59,5 @@ class BFS(Strategy):
 
 
 if __name__ == "__main__":
-    bfs = BFS()
+    bfs = BFS("DURL")
     bfs.start()
