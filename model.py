@@ -2,7 +2,7 @@ import numpy as np
 from random import randint, choice
 
 class Model:
-    def __init__(self):
+    def __init__(self, search_order=None, heuristic=None):
         self.target_state = np.array([[1, 2, 3, 4],
                                       [5, 6, 7, 8],
                                       [9, 10, 11, 12],
@@ -13,11 +13,15 @@ class Model:
         self.zero_position = None
 
         self.__generate_state()
+        self.search_order = search_order
+        self.heuristic = heuristic
 
     # generates the random 15-puzzle starting state
     def __generate_state(self):
         self.current_state = np.copy(self.target_state)
         self.zero_position = (3, 3)
+
+        # number of operations mixing the state
         for i in range(randint(5, 15)):
             op = choice(self.get_operators())
             self.current_state, self.zero_position = self.get_neighbour_state(op)
@@ -31,7 +35,7 @@ class Model:
     def get_operators(self):
         tmp = []
 
-        # possibly change the sequence these get appended in the future depending on how the algorithm works
+        # TODO possibly change the sequence these get appended in the future depending on how the algorithm works
         if self.zero_position[0]:
             tmp.append('U')
         if self.zero_position[1]:
@@ -47,6 +51,8 @@ class Model:
     def get_neighbour_state(self, operator):
         
         new_state = np.copy(self.current_state)
+
+
 
         if operator == 'U':
             tmp = list(self.zero_position)

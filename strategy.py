@@ -7,6 +7,5 @@ class Strategy():
         self.zeros = []
         self.path = []
         self.model = Model()
-        self.search_order = search_order
         self.max_depth = max_depth
         self.current_depth = 0
