@@ -5,10 +5,10 @@ class BFS(Strategy):
 
     def start(self):
         if not self.model.is_solved():
-            print(bfs.model.current_state)
+            print(self.model.current_state)
             self.run(0, 0, '')
         else:
-            print(bfs.model.current_state)
+            print(self.model.current_state)
 
     def run(self, nodes_in_level, current_node, parent):
         if not self.model.is_solved() and self.current_depth <= self.max_depth:

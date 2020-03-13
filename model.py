@@ -2,7 +2,7 @@ import numpy as np
 from random import randint, choice
 
 class Model:
-    def __init__(self, search_order=None, heuristic=None):
+    def __init__(self, search_order="LRUD", heuristic=None):
         self.target_state = np.array([[1, 2, 3, 4],
                                       [5, 6, 7, 8],
                                       [9, 10, 11, 12],
@@ -11,10 +11,10 @@ class Model:
         # placeholders for the vars to improve code readability, used in __generate_state()
         self.current_state = None
         self.zero_position = None
-
-        self.__generate_state()
         self.search_order = search_order
         self.heuristic = heuristic
+
+        self.__generate_state()
 
     # generates the random 15-puzzle starting state
     def __generate_state(self):
@@ -33,26 +33,25 @@ class Model:
         new_state[a] = tmp
 
     def get_operators(self):
-        tmp = []
+        allowed = []
 
-        # TODO possibly change the sequence these get appended in the future depending on how the algorithm works
         if self.zero_position[0]:
-            tmp.append('U')
+            allowed.append('U')
         if self.zero_position[1]:
-            tmp.append('L')
+            allowed.append('L')
         if self.zero_position[0] != 3:
-            tmp.append('D')
+            allowed.append('D')
         if self.zero_position[1] != 3:
-            tmp.append('R')
-        return tmp
+            allowed.append('R')
+        
+
+        return [char for char in self.search_order.upper() if char in allowed]
 
 
     # return the new state as a numpy 2dim array and the position of 0 in the array
     def get_neighbour_state(self, operator):
         
         new_state = np.copy(self.current_state)
-
-
 
         if operator == 'U':
             tmp = list(self.zero_position)
