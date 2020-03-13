@@ -1,39 +1,37 @@
 import numpy as np
-from random import choice
+from random import randint, choice
 
 class Model:
     def __init__(self):
         self.target_state = np.array([[1, 2, 3, 4],
                                       [5, 6, 7, 8],
                                       [9, 10, 11, 12],
-                                      [13, 14, 15, 0]])
+                                      [13, 14, 15, 0]], np.int8)
         
-        self.current_state, self.zero_position = self.__generate_state()
+        # placeholders for the vars to improve code readability, used in __generate_state()
+        self.current_state = None
+        self.zero_position = None
+
+        self.__generate_state()
 
     # generates the random 15-puzzle starting state
-    # returns a tuple (random state, position of the 0 element)
     def __generate_state(self):
-        numbers = list(range(16))
-        state = np.array([[-1, -1, -1, -1] for i in range(4)])
-        while numbers:
-            for i in range(4):
-                for j in range(4):
-                    if state[i, j] == -1:
-                        tmp = choice(numbers)
-                        if not tmp:
-                            zero = (i, j)
-                        state[i, j] = tmp
-                        numbers.remove(tmp)
+        self.current_state = np.copy(self.target_state)
+        self.zero_position = (3, 3)
+        for i in range(randint(5, 15)):
+            op = choice(self.get_operators())
+            self.current_state, self.zero_position = self.get_neighbour_state(op)
 
-        return state, zero
+    def __swap(self, a, new_state):
+        a = tuple(a)
+        tmp = new_state[self.zero_position]
+        new_state[self.zero_position] = new_state[a]
+        new_state[a] = tmp
 
-    def __swap(self, a, b):
-        tmp = self.current_state[a]
-        self.current_state[a] = self.current_state[b]
-        self.current_state[b] = tmp
-
-    def get_neighbour_states(self):
+    def get_operators(self):
         tmp = []
+
+        # possibly change the sequence these get appended in the future depending on how the algorithm works
         if self.zero_position[0]:
             tmp.append('U')
         if self.zero_position[1]:
@@ -43,6 +41,35 @@ class Model:
         if self.zero_position[1] != 3:
             tmp.append('R')
         return tmp
+
+
+    # return the new state as a numpy 2dim array and the position of 0 in the array
+    def get_neighbour_state(self, operator):
+        
+        new_state = np.copy(self.current_state)
+
+        if operator == 'U':
+            tmp = list(self.zero_position)
+            tmp[0] -= 1
+            self.__swap(tmp, new_state)
+        
+        if operator == 'L':
+            tmp = list(self.zero_position)
+            tmp[1] -= 1
+            self.__swap(tmp, new_state)
+
+        if operator == 'D':
+            tmp = list(self.zero_position)
+            tmp[0] += 1
+            self.__swap(tmp, new_state)
+
+        if operator == 'R':
+            tmp = list(self.zero_position)
+            tmp[1] += 1
+            self.__swap(tmp, new_state)
+        
+
+        return new_state, tuple(tmp)
 
     def is_solved(self):
         return np.array_equal(self.current_state, self.target_state)
