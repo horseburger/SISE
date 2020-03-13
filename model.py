@@ -22,7 +22,7 @@ class Model:
         self.zero_position = (3, 3)
 
         # number of operations mixing the state
-        for i in range(randint(5, 15)):
+        for i in range(randint(5, 30)):
             op = choice(self.get_operators())
             self.current_state, self.zero_position = self.get_neighbour_state(op)
 

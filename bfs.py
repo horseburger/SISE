@@ -8,21 +8,23 @@ class BFS(Strategy):
 
     def start(self):
         if not self.model.is_solved():
-            print(self.model.current_state)
-            self.run(0, 0, '')
-        else:
-            print(self.model.current_state)
+            self.run()
+        return True
 
-    def run(self, nodes_in_level, current_node, parent):
+    def run(self, nodes_in_level=0, current_node=0):
         if not self.model.is_solved() and self.current_depth <= self.max_depth:
             self.explored.append(np.copy(self.model.current_state))
             ops = self.model.get_operators()
 
+            # increase the depth level by one 
             if current_node == nodes_in_level:
                 self.current_depth += 1
                 nodes_in_level = len(ops)
                 current_node = 0
 
+
+            # pop the first item from the path list and expand on it
+            path = self.path.pop(0)
 
             for op in ops:
                 new_state, new_zero = self.model.get_neighbour_state(op)
@@ -43,21 +45,24 @@ class BFS(Strategy):
                 if not flagFrontier or not flagExplored:
                     self.frontier.append(new_state)
                     self.zeros.append(new_zero)
-                    self.path.append(op)
+                    new_path = list(path)
+                    new_path.append(op)
+                    self.path.append(new_path)
+                    
+                    
             
             self.model.current_state = np.copy(self.frontier[0])
             self.model.zero_position = tuple(self.zeros[0])
             del self.frontier[0]
             del self.zeros[0]
-            del self.path[0]
-            self.run(nodes_in_level, current_node + 1, self.path[0])
 
+
+            self.run(nodes_in_level, current_node + 1)
         else:
-            print(self.model.is_solved())
-            print(self.model.current_state)
+            return True
 
 
 
 if __name__ == "__main__":
-    bfs = BFS("DURL")
+    bfs = BFS("RDLU")
     bfs.start()

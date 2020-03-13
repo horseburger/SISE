@@ -23,17 +23,19 @@ def load_config(filename):
 
 def save_result(filename, result):
     with open(filename, 'w+') as f:
-        f.write(len(result))
+        f.write(str(len(result)) + '\n')
         f.write(','.join(result))
 
 def save_info(filename, result_length, frontier_length, explored_length, max_depth, time):
     with open(filename, 'w+') as f:
-        f.write(result_length)
-        f.write(explored_length)
-        f.write(frontier_length)
-        f.write(max_depth)
-        f.write(time)
+        f.write(str(result_length) + '\n')
+        f.write(str(explored_length) + '\n')
+        f.write(str(frontier_length) + '\n')
+        f.write(str(max_depth) + '\n')
+        f.write(str(time)+ '\n')
 
 if __name__ == "__main__":
     bfs = BFS()
-    bfs.start()
+    if bfs.start():
+        save_result('dupsko', bfs.path[0])
+    print(bfs.model, bfs.path[0])
