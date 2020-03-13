@@ -3,7 +3,7 @@ import numpy as np
 
 class BFS(Strategy):
 
-    def __init__(self, search_order):
+    def __init__(self, search_order="LRUD"):
         Strategy.__init__(self, search_order=search_order)
 
     def start(self):

@@ -26,6 +26,16 @@ class Model:
             op = choice(self.get_operators())
             self.current_state, self.zero_position = self.get_neighbour_state(op)
 
+    def load_layout(self, dimensions, layout):
+        state = np.array([[-1]*dimensions[0] for _ in range(dimensions[1])], np.int8)
+        mod = dimensions[0] * dimensions[1]
+        for i in range(mod):
+            if not layout[i]: 
+                self.zero_position = (i // dimensions[0], i % dimensions[1])
+            state[i // dimensions[0], i % dimensions[1]] = layout[i]
+        
+        self.current_state = np.copy(state)
+
     def __swap(self, a, new_state):
         a = tuple(a)
         tmp = new_state[self.zero_position]
