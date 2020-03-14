@@ -47,7 +47,7 @@ class BFS(Strategy):
                     self.zeros.append(new_zero)
                     new_path = list(path)
                     new_path.append(op)
-                    self.path.insert(-1, new_path)
+                    self.path.append(new_path)
 
             self.model.current_state = np.copy(self.frontier[0])
             self.model.zero_position = tuple(self.zeros[0])
@@ -61,4 +61,7 @@ class BFS(Strategy):
 
 if __name__ == "__main__":
     bfs = BFS("RDLU")
+    print(bfs.model)
     bfs.start()
+    print(bfs.model)
+    print(bfs.path[0])
