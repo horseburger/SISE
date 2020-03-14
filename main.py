@@ -47,16 +47,9 @@ if __name__ == "__main__":
     dfs.model.first_state = np.copy(bfs.model.current_state)
     dfs.model.first_zeros = tuple(bfs.model.zero_position)
     dfs.model.zero_position = tuple(bfs.model.zero_position)
-    print("Model before DFS and BFS")
-    print(bfs.model)
-    print(dfs.model)
     if bfs.start():
         save_result('BFS', bfs.path[0])
         print(bfs.model, bfs.path[0])
-    print("Model after BFS")
-    print(bfs.model, bfs.path[0])
-
     if dfs.start():
         save_result('DFS', dfs.path[0])
-    print("Model after DFS")
-    print(dfs.model, dfs.path[0])
+        print(dfs.model, dfs.path[0])

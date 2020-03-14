@@ -12,3 +12,7 @@ class Strategy():
         self.max_width = max_width
         self.current_depth = 0
         self.current_width = 0
+        self.current_depth = 0
+
+    def get_recursion_depth(self):
+        return max([len(steps) for steps in path])
