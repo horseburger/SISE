@@ -36,6 +36,7 @@ def save_info(filename, result_length, frontier_length, explored_length, max_dep
 
 if __name__ == "__main__":
     bfs = BFS()
+    print("before: " + str(bfs.model))
     if bfs.start():
         save_result('dupsko', bfs.path[0])
-    print(bfs.model, bfs.path[0])
+    print("after: " + str(bfs.model) + str(bfs.path[0]))
