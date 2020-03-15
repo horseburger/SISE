@@ -1,6 +1,5 @@
 from strategy import Strategy
 import numpy as np
-from random import shuffle
 
 
 class DFS(Strategy):

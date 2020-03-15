@@ -14,13 +14,15 @@ class BFS(Strategy):
         return flag
 
     def start(self):
+        # print(self.path[0])
         if not self.model.is_solved(): 
             #  and self.current_depth <= self.max_depth:
-            if len(self.path[0]) >= self.max_depth:
+            if len(self.path[0]) > self.max_depth:
                 self.model.current_state = self.model.first_state
                 self.model.zero_position = self.model.first_zero
-                self.path.pop(0)
-                return -1
+                print(len(self.path))
+                self.path = [[]]
+                return -2
 
             self.explored.append(np.copy(self.model.current_state))
             ops = self.model.get_operators()
@@ -62,7 +64,7 @@ class BFS(Strategy):
             del self.frontier[0]
             del self.zeros[0]
 
-            return self.run()
+            return self.start()
         else:
             return True
 

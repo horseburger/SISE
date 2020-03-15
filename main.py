@@ -2,6 +2,7 @@ from bfs import BFS
 from dfs import DFS
 import numpy as np
 import argparse
+from random import shuffle
 
 
 # argument parser
@@ -16,7 +17,6 @@ parser.add_argument("output", help="Result filename")
 parser.add_argument("info", help="Additional info filename")
 
 args = parser.parse_args()
-print(args)
 
 def load_config(filename):
     with open(filename, 'r') as f:
@@ -41,33 +41,36 @@ def save_info(filename, result_length, frontier_length, explored_length, max_dep
         f.write(str(max_depth) + '\n')
         f.write(str(time) + '\n')
 
+def randomize_search_order():
+    order = list("LRUD")
+    x = set()
+    for _ in range(32):
+        shuffle(order)
+        x.add(''.join(order))
+
+    return x
+    
+
 
 if __name__ == "__main__":
-
-    # bfs = BFS()
-    # dfs = DFS()
-    # dfs.model.current_state = np.copy(bfs.model.current_state)
-    # dfs.model.first_state = np.copy(bfs.model.current_state)
-    # dfs.model.first_zeros = tuple(bfs.model.zero_position)
-    # dfs.model.zero_position = tuple(bfs.model.zero_position)
-    # if bfs.start():
-    #     save_result('BFS', bfs.path[0])
-    #     print(bfs.model, bfs.path[0])
-    # if dfs.start():
-    #     save_result('DFS', dfs.path[0])
-    #     print(dfs.model, dfs.path[0])
 
     dimensions, layout = load_config(args.start)
     if args.strategy == 'bfs':
         bfs = BFS(search_order=args.parameter)
         bfs.model.load_layout(dimensions, layout)
-        print(bfs.model)
         bfs.run()
-        print(bfs.model)
-        print(bfs.path[0])
+        print(bfs.model.zero_position, bfs.path[0])
     elif args.strategy == 'dfs':
         dfs = DFS(search_order=args.parameter)
         dfs.model.load_layout(dimensions, layout)
-        print(dfs.model)
         dfs.run()
         print(dfs.path[-1])
+
+
+    # for i in randomize_search_order():
+    #     bfs = BFS(search_order=i)
+    #     dims, lay = load_config("puzzles/4x4_07_00001.txt")
+    #     bfs.model.load_layout(dims, lay)
+    #     bfs.run()
+    #     # print(bfs.model.first_state)
+    #     print(i, bfs.path[0])
