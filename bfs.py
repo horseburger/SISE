@@ -7,11 +7,6 @@ class BFS(Strategy):
     def __init__(self, search_order="LRUD"):
         Strategy.__init__(self, search_order=search_order)
 
-    def start(self):
-        if not self.model.is_solved():
-            self.run()
-        return True
-
     def run(self, nodes_in_level=0, current_node=0):
         if not self.model.is_solved() and self.current_depth <= self.max_depth:
             self.explored.append(np.copy(self.model.current_state))
@@ -30,7 +25,6 @@ class BFS(Strategy):
                 new_state, new_zero = self.model.get_neighbour_state(op)
 
                 # check if any of the arrays in frontier or explored match with the new array
-                # TODO if inline ???
                 flagFrontier = False
                 for row in self.frontier:
                     if np.array_equal(new_state, row):
@@ -63,6 +57,6 @@ class BFS(Strategy):
 if __name__ == "__main__":
     bfs = BFS("RDLU")
     print(bfs.model)
-    bfs.start()
+    bfs.run()
     print(bfs.model)
     print(bfs.path[0])

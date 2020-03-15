@@ -1,25 +1,38 @@
 from strategy import Strategy
 import numpy as np
+from random import shuffle
 
 
 class DFS(Strategy):
 
-    def __init__(self, search_order="LRUD"):
+    def __init__(self, search_order="DLRU"):
         Strategy.__init__(self, search_order=search_order)
 
+    def run(self):
+        flag = -1
+        while flag == -1:
+            flag = self.start()
+
     def start(self, nodes_in_level=0, current_node=0):  # method running recursively
-        if not self.model.is_solved() and self.current_depth <= self.max_depth:  # compare current state to solution
+        if not self.model.is_solved(): # compare current state to solution
+            if self.current_depth > self.max_depth:
+                self.frontier = []
+                self.zeros = []
+                self.current_depth = 0
+                self.path = [[]]
+                return -1
+
             # add current state to explored
             self.explored.append(np.copy(self.model.current_state))
             ops = self.model.get_operators()  # get available operators
 
-            if current_node == nodes_in_level:  # if last node in level
-                self.current_depth += 1  # increase the depth level by one
-                nodes_in_level = len(ops)  # check available nodes in level
-                current_node = 0  # reset current node
+            # if current_node == nodes_in_level:  # if last node in level
+                # self.current_depth += 1  # increase the depth level by one
+                # nodes_in_level = len(ops)  # check available nodes in level
+                # current_node = 0  # reset current node
 
             # pop the first item from the path list and expand on it
-            path = self.path.pop(0)
+            path = self.path.pop()
 
             for op in ops:  # iterate over all available operators
                 # get new state and zero position
@@ -56,19 +69,44 @@ class DFS(Strategy):
             self.model.zero_position = tuple(self.zeros[-1])
 
             # del state
-            del self.frontier[-1]
+            # del self.frontier[-1]
+            self.frontier.pop()
 
             # del zero position
-            del self.zeros[-1]
+            # del self.zeros[-1]
+            self.zeros.pop()
 
-            if(self.current_depth == self.max_depth and self.current_width <= self.max_width):
-                self.current_depth = 0
-                self.model.current_state = np.copy(self.model.first_state)
-                self.model.zero_position = tuple(self.model.first_zeros)
-                self.current_width += 1
-                self.start(0, 0)
-            else:
-                return True
-            self.start(nodes_in_level, current_node + 1)
+            # if(self.current_depth == self.max_depth and self.current_width <= self.max_width):
+            #     self.current_depth = 0
+            #     self.model.current_state = np.copy(self.model.first_state)
+            #     self.model.zero_position = tuple(self.model.first_zeros)
+            #     self.current_width += 1
+            #     self.start(0, 0)
+            # else:
+            #     return True
+            self.current_depth += 1
+            return self.start()
         else:
             return True
+
+if __name__ == "__main__":
+    dfs = DFS()
+    print(dfs.model)
+    dfs.run()
+    print(dfs.model)
+    print(dfs.path)
+    # order = list("LRUD")
+    # x = set()
+    # for _ in range(30):
+    #     shuffle(order)
+    #     x.add(''.join(order))
+
+    # for order in x:
+    #     dfs = DFS(search_order=order)
+    #     start_zero = dfs.model.zero_position
+    #     print("start -> ", start_zero)
+    #     dfs.start()
+    #     end_zero = dfs.model.zero_position
+    #     if end_zero == (3, 3) and start_zero != (3, 3):
+    #         print(start_zero, end_zero)
+    #         print(dfs.path[-1])

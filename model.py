@@ -25,7 +25,7 @@ class Model:
         self.zero_position = (3, 3)
 
         # number of operations mixing the state
-        for i in range(randint(5, 30)):
+        for i in range(randint(2, 10)):
             op = choice(self.get_operators())
             self.current_state, self.zero_position = self.get_neighbour_state(
                 op)
@@ -44,11 +44,7 @@ class Model:
         self.current_state = np.copy(state)
 
     def __swap(self, a, new_state):
-        # TODO oneline this bitch 
-        a = tuple(a)
-        tmp = new_state[self.zero_position]
-        new_state[self.zero_position] = new_state[a]
-        new_state[a] = tmp
+        new_state[self.zero_position], new_state[tuple(a)] = new_state[tuple(a)], new_state[self.zero_position]
 
     def get_operators(self):
         allowed = []
