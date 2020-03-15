@@ -7,16 +7,29 @@ class BFS(Strategy):
     def __init__(self, search_order="LRUD"):
         Strategy.__init__(self, search_order=search_order)
 
-    def run(self, nodes_in_level=0, current_node=0):
-        if not self.model.is_solved() and self.current_depth <= self.max_depth:
+    def run(self):
+        flag = -1
+        while flag == -1:
+            flag = self.start()
+        return flag
+
+    def start(self):
+        if not self.model.is_solved(): 
+            #  and self.current_depth <= self.max_depth:
+            if len(self.path[0]) >= self.max_depth:
+                self.model.current_state = self.model.first_state
+                self.model.zero_position = self.model.first_zero
+                self.path.pop(0)
+                return -1
+
             self.explored.append(np.copy(self.model.current_state))
             ops = self.model.get_operators()
 
             # increase the depth level by one
-            if current_node == nodes_in_level:
-                self.current_depth += 1
-                nodes_in_level = len(ops)
-                current_node = 0
+            # if current_node == nodes_in_level:
+            #     self.current_depth += 1
+            #     nodes_in_level = len(ops)
+            #     current_node = 0
 
             # pop the first item from the path list and expand on it
             path = self.path.pop(0)
@@ -49,7 +62,7 @@ class BFS(Strategy):
             del self.frontier[0]
             del self.zeros[0]
 
-            self.run(nodes_in_level, current_node + 1)
+            return self.run()
         else:
             return True
 

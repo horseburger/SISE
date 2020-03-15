@@ -2,7 +2,7 @@ from model import Model
 
 
 class Strategy():
-    def __init__(self, search_order="LRUD", max_depth=10, max_width=20, heuristic=None):
+    def __init__(self, search_order="LRUD", max_depth=8, max_width=20, heuristic=None):
         self.frontier = []
         self.explored = []
         self.zeros = []

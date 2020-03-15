@@ -44,6 +44,8 @@ class Model:
             state[i // dimensions[0], i % dimensions[1]] = layout[i]
 
         self.current_state = np.copy(state)
+        self.first_state = np.copy(state)
+        self.first_zero = self.zero_position
 
     def __swap(self, a, new_state):
         new_state[self.zero_position], new_state[tuple(a)] = new_state[tuple(a)], new_state[self.zero_position]
