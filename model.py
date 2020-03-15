@@ -13,7 +13,7 @@ class Model:
         self.current_state = None
         self.zero_position = None
         self.first_state = None
-        self.first_zeros = None
+        self.first_zero = None
         self.search_order = search_order
         self.heuristic = heuristic
 
@@ -25,12 +25,14 @@ class Model:
         self.zero_position = (3, 3)
 
         # number of operations mixing the state
-        for i in range(randint(2, 10)):
+        for i in range(7):
             op = choice(self.get_operators())
             self.current_state, self.zero_position = self.get_neighbour_state(
                 op)
 
         self.current_state = self.current_state.astype(np.int8)
+        self.first_state = np.copy(self.current_state)
+        self.first_zero = self.zero_position
 
     def load_layout(self, dimensions, layout):
         state = np.array([[-1]*dimensions[0]
