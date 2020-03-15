@@ -30,6 +30,7 @@ class BFS(Strategy):
                 new_state, new_zero = self.model.get_neighbour_state(op)
 
                 # check if any of the arrays in frontier or explored match with the new array
+                # TODO if inline ???
                 flagFrontier = False
                 for row in self.frontier:
                     if np.array_equal(new_state, row):

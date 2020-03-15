@@ -30,6 +30,8 @@ class Model:
             self.current_state, self.zero_position = self.get_neighbour_state(
                 op)
 
+        self.current_state = self.current_state.astype(np.int8)
+
     def load_layout(self, dimensions, layout):
         state = np.array([[-1]*dimensions[0]
                           for _ in range(dimensions[1])], np.int8)
@@ -42,6 +44,7 @@ class Model:
         self.current_state = np.copy(state)
 
     def __swap(self, a, new_state):
+        # TODO oneline this bitch 
         a = tuple(a)
         tmp = new_state[self.zero_position]
         new_state[self.zero_position] = new_state[a]
