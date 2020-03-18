@@ -3,7 +3,7 @@ from collections import defaultdict
 
 
 class Strategy():
-    def __init__(self, search_order="LRUD", max_depth=7, max_width=20, heuristic=None):
+    def __init__(self, search_order="LRUD", max_depth=15, max_width=20, heuristic=None):
         self.frontier = []
         self.explored = []
         self.frontier_hash = defaultdict(bool)

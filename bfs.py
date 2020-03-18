@@ -8,26 +8,15 @@ class BFS(Strategy):
         Strategy.__init__(self, search_order=search_order)
 
     def run(self):
-        flag = -1
-        while flag == -1:
-            flag = self.start()
-        return flag
-
-    def start(self):
-        if not self.model.is_solved(): 
-            #  and self.current_depth <= self.max_depth:
+        flag = self.model.is_solved()
+        while not flag:
             if len(self.path[0]) > self.max_depth:
-                self.model.current_state = self.model.first_state
-                self.model.zero_position = self.model.first_zero
-                self.path.pop(0)
                 return -1
-
+            
             self.explored.append(np.copy(self.model.current_state))
             self.explored_hash[sha256(self.model.current_state).hexdigest()] = True
             ops = self.model.get_operators()
 
-
-            # pop the first item from the path list and expand on it
             path = self.path.pop(0)
 
             for op in ops:
@@ -43,13 +32,13 @@ class BFS(Strategy):
                     self.path.append(new_path)
 
             self.model.current_state = np.copy(self.frontier[0])
-            self.model.zero_position = tuple(self.zeros[0])
+            self.model.zero_position = self.zeros[0]
             del self.frontier[0]
             del self.zeros[0]
 
-            return self.start()
-        else:
-            return True
+            flag = self.model.is_solved()
+
+        return flag
 
 
 if __name__ == "__main__":

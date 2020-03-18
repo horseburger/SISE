@@ -6,9 +6,7 @@ from random import shuffle
 import sys
 import time
 
-# TODO implement hash table for explored and frontier comparison using hashlib.sha256
-
-sys.setrecursionlimit(10**6)
+sys.setrecursionlimit(10**5)
 # argument parser
 parser = argparse.ArgumentParser()
 parser.add_argument("strategy", help="Choose between bfs, dfs and astr", choices=[
@@ -73,8 +71,8 @@ if __name__ == "__main__":
         dfs.model.load_layout(dimensions, layout)
         dfs.run()
         end = time.time() - start
-        print(dfs.path[-1])
-    # start = time.time()
+        print(dfs.path[-1], dfs.model.zero_position)
+    start = time.time()
     # for i in randomize_search_order():
     #     bfs = BFS(search_order=i)
     #     dims, lay = load_config("puzzles/4x4_07_00002.txt")
@@ -83,4 +81,4 @@ if __name__ == "__main__":
     #     # print(bfs.model.first_state)
     #     print(i, bfs.path[-1], flag)
 
-    # print(time.time() - start)
+    print(time.time() - start)
