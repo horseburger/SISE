@@ -3,8 +3,12 @@ from dfs import DFS
 import numpy as np
 import argparse
 from random import shuffle
+import sys
+import time
 
+# TODO implement hash table for explored and frontier comparison using hashlib.sha256
 
+sys.setrecursionlimit(10**6)
 # argument parser
 parser = argparse.ArgumentParser()
 parser.add_argument("strategy", help="Choose between bfs, dfs and astr", choices=[
@@ -54,23 +58,29 @@ def randomize_search_order():
 
 if __name__ == "__main__":
 
+    orders = ["RDUL", "RDLU", "DRUL", "DRLU", "LUDR", "LURD", "ULDR", "ULRD"]
+
     dimensions, layout = load_config(args.start)
+    start = time.time()
     if args.strategy == 'bfs':
         bfs = BFS(search_order=args.parameter)
         bfs.model.load_layout(dimensions, layout)
         bfs.run()
+        end = time.time() - start
         print(bfs.model.zero_position, bfs.path[0])
     elif args.strategy == 'dfs':
         dfs = DFS(search_order=args.parameter)
         dfs.model.load_layout(dimensions, layout)
         dfs.run()
+        end = time.time() - start
         print(dfs.path[-1])
-
-
+    # start = time.time()
     # for i in randomize_search_order():
     #     bfs = BFS(search_order=i)
-    #     dims, lay = load_config("puzzles/4x4_07_00001.txt")
+    #     dims, lay = load_config("puzzles/4x4_07_00002.txt")
     #     bfs.model.load_layout(dims, lay)
-    #     bfs.run()
+    #     flag = bfs.run()
     #     # print(bfs.model.first_state)
-    #     print(i, bfs.path[0])
+    #     print(i, bfs.path[-1], flag)
+
+    # print(time.time() - start)

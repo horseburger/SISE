@@ -1,10 +1,13 @@
 from model import Model
+from collections import defaultdict
 
 
 class Strategy():
     def __init__(self, search_order="LRUD", max_depth=7, max_width=20, heuristic=None):
         self.frontier = []
         self.explored = []
+        self.frontier_hash = defaultdict(bool)
+        self.explored_hash = defaultdict(bool)
         self.zeros = []
         self.path = [[]]
         self.model = Model(search_order=search_order, heuristic=heuristic)

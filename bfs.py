@@ -1,6 +1,6 @@
 from strategy import Strategy
 import numpy as np
-
+from hashlib import sha256
 
 class BFS(Strategy):
 
@@ -14,46 +14,29 @@ class BFS(Strategy):
         return flag
 
     def start(self):
-        # print(self.path[0])
         if not self.model.is_solved(): 
             #  and self.current_depth <= self.max_depth:
             if len(self.path[0]) > self.max_depth:
                 self.model.current_state = self.model.first_state
                 self.model.zero_position = self.model.first_zero
-                print(len(self.path))
-                self.path = [[]]
-                return -2
+                self.path.pop(0)
+                return -1
 
             self.explored.append(np.copy(self.model.current_state))
+            self.explored_hash[sha256(self.model.current_state).hexdigest()] = True
             ops = self.model.get_operators()
 
-            # increase the depth level by one
-            # if current_node == nodes_in_level:
-            #     self.current_depth += 1
-            #     nodes_in_level = len(ops)
-            #     current_node = 0
 
             # pop the first item from the path list and expand on it
             path = self.path.pop(0)
 
             for op in ops:
                 new_state, new_zero = self.model.get_neighbour_state(op)
+                new_state_hash = sha256(new_state).hexdigest()
 
-                # check if any of the arrays in frontier or explored match with the new array
-                flagFrontier = False
-                for row in self.frontier:
-                    if np.array_equal(new_state, row):
-                        flagFrontier = True
-                        break
-
-                flagExplored = False
-                for row in self.explored:
-                    if np.array_equal(new_state, row):
-                        flagExplored = True
-                        break
-
-                if not flagFrontier and not flagExplored:
+                if not self.frontier_hash[new_state_hash] and not self.explored_hash[new_state_hash]:
                     self.frontier.append(new_state)
+                    self.frontier_hash[new_state_hash] = True
                     self.zeros.append(new_zero)
                     new_path = list(path)
                     new_path.append(op)

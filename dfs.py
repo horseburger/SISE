@@ -1,5 +1,6 @@
 from strategy import Strategy
 import numpy as np
+from hashlib import sha256
 
 
 class DFS(Strategy):
@@ -14,17 +15,20 @@ class DFS(Strategy):
             flag = self.start()
         return flag
 
-    def start(self, nodes_in_level=0, current_node=0):  # method running recursively
+    def start(self):  # method running recursively
         if not self.model.is_solved(): # compare current state to solution
-
             if len(self.path[-1]) > self.max_depth:
                 self.model.current_state = self.frontier.pop()
                 self.model.zero_position = self.zeros.pop()
                 self.path.pop()
                 return -1
+            elif not len(self.frontier) and len(self.explored):
+                return -2
 
             # add current state to explored
+
             self.explored.append(np.copy(self.model.current_state))
+            self.explored_hash[sha256(self.model.current_state).hexdigest()] = True
             ops = self.model.get_operators()  # get available operators
 
 
@@ -34,24 +38,13 @@ class DFS(Strategy):
             for op in ops:  # iterate over all available operators
                 # get new state and zero position
                 new_state, new_zero = self.model.get_neighbour_state(op)
+                new_state_hash = sha256(new_state).hexdigest()
 
-                # represent if any of the arrays in frontier match with the new array
-                flagFrontier = False
-                for row in self.frontier:
-                    if np.array_equal(new_state, row):
-                        flagFrontier = True
-                        break
 
-                # represent if any of the arrays in explored match with the new array
-                flagExplored = False
-                for row in self.explored:
-                    if np.array_equal(new_state, row):
-                        flagExplored = True
-                        break
-
-                if not flagFrontier and not flagExplored:
+                if not self.frontier_hash[new_state_hash] and not self.explored_hash[new_state_hash]:
                     # add current state to frontier
                     self.frontier.append(new_state)
+                    self.frontier_hash[new_state_hash] = True
                     # add current zero position to zeros list(like frontier)
                     self.zeros.append(new_zero)
                     # add operation to path
