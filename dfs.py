@@ -10,10 +10,14 @@ class DFS(Strategy):
         Strategy.__init__(self, search_order=search_order)
 
     def run(self):
-        flag = -1
-        while flag == -1:
+        while True:
             flag = self.start()
-        return flag
+            if flag == -1:
+                continue
+            if flag == -2:
+                return -2
+            if flag == True:
+                return flag
 
     def start(self):  # method running recursively
         if not self.model.is_solved(): # compare current state to solution

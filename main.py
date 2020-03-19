@@ -65,14 +65,17 @@ if __name__ == "__main__":
         bfs.model.load_layout(dimensions, layout)
         bfs.run()
         end = time.time() - start
-        print(bfs.model.zero_position, bfs.path[0])
+        save_result(args.output, bfs.path[0])
+        save_info(args.info, len(bfs.path[0]), len(bfs.frontier), len(bfs.explored), bfs.max_depth, end)
+        # print(bfs.model.zero_position, bfs.path[0])
     elif args.strategy == 'dfs':
         dfs = DFS(search_order=args.parameter)
         dfs.model.load_layout(dimensions, layout)
         dfs.run()
         end = time.time() - start
-        print(dfs.path[-1], dfs.model.zero_position)
-    start = time.time()
+        save_result(args.output, dfs.path[-1])
+        save_info(args.info, len(dfs.path[-1]), len(dfs.frontier_hash), len(dfs.explored_hash), dfs.max_depth, end)
+    # start = time.time()
     # for i in randomize_search_order():
     #     bfs = BFS(search_order=i)
     #     dims, lay = load_config("puzzles/4x4_07_00002.txt")
@@ -81,4 +84,4 @@ if __name__ == "__main__":
     #     # print(bfs.model.first_state)
     #     print(i, bfs.path[-1], flag)
 
-    print(time.time() - start)
+    # print(time.time() - start)
