@@ -64,7 +64,7 @@ if __name__ == "__main__":
         bfs = BFS(search_order=args.parameter)
         bfs.model.load_layout(dimensions, layout)
         bfs.run()
-        end = time.time() - start
+        end = round((time.time() - start) * 1000, 3)
         save_result(args.output, bfs.path[0])
         save_info(args.info, len(bfs.path[0]), len(bfs.frontier), len(bfs.explored), bfs.max_depth, end)
         # print(bfs.model.zero_position, bfs.path[0])
@@ -72,7 +72,7 @@ if __name__ == "__main__":
         dfs = DFS(search_order=args.parameter)
         dfs.model.load_layout(dimensions, layout)
         dfs.run()
-        end = time.time() - start
+        end = round((time.time() - start) * 1000, 3)
         save_result(args.output, dfs.path[-1])
         save_info(args.info, len(dfs.path[-1]), len(dfs.frontier_hash), len(dfs.explored_hash), dfs.max_depth, end)
     # start = time.time()
