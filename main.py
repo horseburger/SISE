@@ -20,6 +20,7 @@ parser.add_argument("info", help="Additional info filename")
 
 args = parser.parse_args()
 
+
 def load_config(filename):
     with open(filename, 'r') as f:
         dimensions = [int(num) for num in f.readline().strip('\n').split(' ')]
@@ -37,11 +38,12 @@ def save_result(filename, result):
 
 def save_info(filename, result_length, frontier_length, explored_length, max_depth, time):
     with open(filename, 'w+') as f:
-        f.write(str(result_length) + '\n')
-        f.write(str(explored_length) + '\n')
-        f.write(str(frontier_length) + '\n')
-        f.write(str(max_depth) + '\n')
-        f.write(str(time) + '\n')
+        f.write('result_length: ' + str(result_length) + '\n')
+        f.write('explored_length: ' + str(explored_length) + '\n')
+        f.write('frontier_length: ' + str(frontier_length) + '\n')
+        f.write('max_depth: ' + str(max_depth) + '\n')
+        f.write('time: ' + str(time) + '\n')
+
 
 def randomize_search_order():
     order = list("LRUD")
@@ -51,7 +53,6 @@ def randomize_search_order():
         x.add(''.join(order))
 
     return x
-    
 
 
 if __name__ == "__main__":
@@ -66,7 +67,8 @@ if __name__ == "__main__":
         bfs.run()
         end = round((time.time() - start) * 1000, 3)
         save_result(args.output, bfs.path[0])
-        save_info(args.info, len(bfs.path[0]), len(bfs.frontier), len(bfs.explored), bfs.max_depth, end)
+        save_info(args.info, len(bfs.path[0]), len(
+            bfs.frontier), len(bfs.explored), bfs.max_depth, end)
         # print(bfs.model.zero_position, bfs.path[0])
     elif args.strategy == 'dfs':
         dfs = DFS(search_order=args.parameter)
@@ -74,7 +76,8 @@ if __name__ == "__main__":
         dfs.run()
         end = round((time.time() - start) * 1000, 3)
         save_result(args.output, dfs.path[-1])
-        save_info(args.info, len(dfs.path[-1]), len(dfs.frontier_hash), len(dfs.explored_hash), dfs.max_depth, end)
+        save_info(args.info, len(
+            dfs.path[-1]), len(dfs.frontier_hash), len(dfs.explored_hash), dfs.max_depth, end)
     # start = time.time()
     # for i in randomize_search_order():
     #     bfs = BFS(search_order=i)
