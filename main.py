@@ -38,11 +38,11 @@ def save_result(filename, result):
 
 def save_info(filename, result_length, frontier_length, explored_length, max_depth, time):
     with open(filename, 'w+') as f:
-        f.write('result_length: ' + str(result_length) + '\n')
-        f.write('explored_length: ' + str(explored_length) + '\n')
-        f.write('frontier_length: ' + str(frontier_length) + '\n')
-        f.write('max_depth: ' + str(max_depth) + '\n')
-        f.write('time: ' + str(time) + '\n')
+        f.write(str(result_length) + '\n')
+        f.write(str(explored_length) + '\n')
+        f.write(str(frontier_length) + '\n')
+        f.write(str(max_depth) + '\n')
+        f.write(str(time) + '\n')
 
 
 def randomize_search_order():
