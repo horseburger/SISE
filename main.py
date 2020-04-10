@@ -60,10 +60,10 @@ if __name__ == "__main__":
     orders = ["RDUL", "RDLU", "DRUL", "DRLU", "LUDR", "LURD", "ULDR", "ULRD"]
 
     dimensions, layout = load_config(args.start)
-    start = time.time()
     if args.strategy == 'bfs':
         bfs = BFS(search_order=args.parameter)
         bfs.model.load_layout(dimensions, layout)
+        start = time.time()
         bfs.run()
         end = round((time.time() - start) * 1000, 3)
         save_result(args.output, bfs.path[0])
@@ -73,6 +73,7 @@ if __name__ == "__main__":
     elif args.strategy == 'dfs':
         dfs = DFS(search_order=args.parameter)
         dfs.model.load_layout(dimensions, layout)
+        start = time.time()
         dfs.run()
         end = round((time.time() - start) * 1000, 3)
         save_result(args.output, dfs.path[-1])
