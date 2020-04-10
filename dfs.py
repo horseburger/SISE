@@ -10,10 +10,8 @@ class DFS(Strategy):
         Strategy.__init__(self, search_order=search_order)
 
     def run(self):
-        while not self.model.is_solved():
-            if not len(self.frontier) and len(self.explored):
-                return -1
-
+        flag = self.model.is_solved()
+        while not flag:
             self.explored.append(np.copy(self.model.current_state))
             self.explored_hash[sha256(
                 self.model.current_state).hexdigest()] = True
@@ -21,25 +19,31 @@ class DFS(Strategy):
 
             path = self.path.pop()
 
-            for op in ops:
-                new_state, new_zero = self.model.get_neighbour_state(op)
-                new_state_hash = sha256(new_state).hexdigest()
-
-                if not self.frontier_hash[new_state_hash] and not self.explored_hash[new_state_hash] and not len(path) >= self.max_depth:
-                    # add current state to frontier
-                    self.frontier.append(new_state)
-                    self.frontier_hash[new_state_hash] = True
-                    # add current zero position to zeros list(like frontier)
-                    self.zeros.append(new_zero)
-                    # add operation to path
-                    new_path = list(path)
-                    new_path.append(op)
-                    self.path.append(new_path)
+            if not len(path) > self.max_depth:
+                for op in ops:
+                    new_state, new_zero = self.model.get_neighbour_state(op)
+                    new_state_hash = sha256(new_state).hexdigest()
+                    if not self.frontier_hash[new_state_hash] and not self.explored_hash[new_state_hash]:
+                        # add current state to frontier
+                        self.frontier.append(new_state)
+                        self.frontier_hash[new_state_hash] = True
+                        # add current zero position to zeros list(like frontier)
+                        self.zeros.append(new_zero)
+                        # add operation to path
+                        new_path = list(path)
+                        new_path.append(op)
+                        self.path.append(new_path)
 
             self.model.current_state = np.copy(self.frontier[-1])
             self.model.zero_position = self.zeros[-1]
+            state_hash = sha256(self.model.current_state).hexdigest()
+            self.frontier_hash[state_hash] = False
             del self.frontier[-1]
             del self.zeros[-1]
+            flag = self.model.is_solved()
+            if not len(self.frontier) and len(self.explored):
+                print('Solution not found')
+                return -1
 
 
 if __name__ == "__main__":
