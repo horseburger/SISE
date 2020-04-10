@@ -41,7 +41,7 @@ class DFS(Strategy):
             del self.frontier[-1]
             del self.zeros[-1]
             flag = self.model.is_solved()
-            if not len(self.frontier) and len(self.explored):
+            if not len(self.frontier) and len(self.explored) and not len(self.path):
                 print('Solution not found')
                 return -1
 
