@@ -50,6 +50,32 @@ def process_results(algo):
     return avg_whole, avg_orders
 
 
+def run_dfs(p):
+    i = 0
+    for puzzle in p:
+    # for puzzle in ["4x4_01_00001.txt", "4x4_02_00001.txt", "4x4_03_00001.txt", "4x4_04_00001.txt", "4x4_05_00001.txt", "4x4_06_00001.txt", "4x4_07_00001.txt"]:
+        for order in orders:
+            dfs = DFS(search_order=order)
+            dim, lay = load_config(path.join("puzzles", puzzle))
+            dfs.model.load_layout(dim, lay)
+            t = time()
+            r = dfs.run()
+            t = round((time() - t) * 1000, 3)
+
+            depth = int(puzzle.split('_')[1])
+            # print(r, puzzle, order)
+            if r:
+                result = {"path_length": -1, "frontier": len(dfs.frontier), "explored": len(dfs.explored), "depth": dfs.deepest, "time": t}
+            else:
+                result = {"path_length": len(dfs.path[0]), "frontier": len(dfs.frontier), "explored": len(dfs.explored), "depth": dfs.deepest, "time": t}
+
+            results["DFS"][order][depth].append(result)
+
+            print("DFS progress: {}%".format(round((i/progress) * 100, 2)), end='\r', flush=True)
+            i += 1
+
+
+
 if __name__ == "__main__":
     progress = len(puzzles) * len(orders)
     i = 0
@@ -80,28 +106,32 @@ if __name__ == "__main__":
     # bfs_avg_whole, bfs_avg_orders = process_results("BFS")
 
 
-    i = 0
-    for puzzle in puzzles:
-    # for puzzle in ["4x4_01_00001.txt", "4x4_02_00001.txt", "4x4_03_00001.txt", "4x4_04_00001.txt", "4x4_05_00001.txt", "4x4_06_00001.txt", "4x4_07_00001.txt"]:
-        for order in orders:
-            dfs = DFS(search_order=order)
-            dim, lay = load_config(path.join("puzzles", puzzle))
-            dfs.model.load_layout(dim, lay)
-            t = time()
-            r = dfs.run()
-            t = round((time() - t) * 1000, 3)
+    # i = 0
+    # for puzzle in puzzles:
+    # # for puzzle in ["4x4_01_00001.txt", "4x4_02_00001.txt", "4x4_03_00001.txt", "4x4_04_00001.txt", "4x4_05_00001.txt", "4x4_06_00001.txt", "4x4_07_00001.txt"]:
+    #     for order in orders:
+    #         dfs = DFS(search_order=order)
+    #         dim, lay = load_config(path.join("puzzles", puzzle))
+    #         dfs.model.load_layout(dim, lay)
+    #         t = time()
+    #         r = dfs.run()
+    #         t = round((time() - t) * 1000, 3)
 
-            depth = int(puzzle.split('_')[1])
-            # print(r, puzzle, order)
-            if r:
-                result = {"path_length": -1, "frontier": len(dfs.frontier), "explored": len(dfs.explored), "depth": dfs.deepest, "time": t}
-            else:
-                result = {"path_length": len(dfs.path[0]), "frontier": len(dfs.frontier), "explored": len(dfs.explored), "depth": dfs.deepest, "time": t}
+    #         depth = int(puzzle.split('_')[1])
+    #         # print(r, puzzle, order)
+    #         if r:
+    #             result = {"path_length": -1, "frontier": len(dfs.frontier), "explored": len(dfs.explored), "depth": dfs.deepest, "time": t}
+    #         else:
+    #             result = {"path_length": len(dfs.path[0]), "frontier": len(dfs.frontier), "explored": len(dfs.explored), "depth": dfs.deepest, "time": t}
 
-            results["DFS"][order][depth].append(result)
+    #         results["DFS"][order][depth].append(result)
 
-            print("DFS progress: {}%".format(round((i/progress) * 100, 2)), end='\r', flush=True)
-            i += 1
+    #         print("DFS progress: {}%".format(round((i/progress) * 100, 2)), end='\r', flush=True)
+    #         i += 1
+
+    with ProcessPoolExecutor(max_workers=8) as executor:
+        for chunk in list(chunks(puzzles, len(puzzles)//8)):
+            executor.submit(run_dfs, chunk)
 
     dfs_avg_whole, dfs_avg_orders = process_results("DFS")    
 
