@@ -17,10 +17,9 @@ class DFS(Strategy):
                 self.model.current_state).hexdigest()] = True
             ops = self.model.get_operators()
 
-            path = self.path.pop()            
+            path = self.path.pop()
 
-            if not len(path) > self.max_depth:
-                self.deepest = max((len(path), self.deepest))
+            if not len(path) > self.max_depth - 1:
                 for op in ops:
                     new_state, new_zero = self.model.get_neighbour_state(op)
                     new_state_hash = sha256(new_state).hexdigest()
@@ -34,17 +33,17 @@ class DFS(Strategy):
                         new_path = list(path)
                         new_path.append(op)
                         self.path.append(new_path)
-
-            self.model.current_state = self.frontier.pop()
-            self.model.zero_position = self.zeros.pop()
-            state_hash = sha256(self.model.current_state).hexdigest()
-            self.frontier_hash[state_hash] = False
-            flag = self.model.is_solved()
             if not len(self.frontier) and len(self.explored) and not len(self.path):
                 print('Solution not found')
                 return -1
+            self.model.current_state = np.copy(self.frontier[-1])
+            self.model.zero_position = self.zeros[-1]
+            state_hash = sha256(self.model.current_state).hexdigest()
+            self.frontier_hash[state_hash] = False
+            del self.frontier[-1]
+            del self.zeros[-1]
+            flag = self.model.is_solved()
 
-        self.deepest = max((len(self.path[-1]), self.deepest))
 
 if __name__ == "__main__":
     dfs = DFS(search_order="RDLU")
