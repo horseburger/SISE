@@ -35,7 +35,7 @@ class DFS(Strategy):
                         new_path.append(op)
                         self.path.append(new_path)
             if not len(self.frontier) and len(self.explored) and not len(self.path):
-                print('Solution not found')
+                # print('Solution not found')
                 return -1
             self.model.current_state = np.copy(self.frontier[-1])
             self.model.zero_position = self.zeros[-1]
