@@ -69,7 +69,7 @@ if __name__ == "__main__":
     
     bfs_avg_whole, bfs_avg_orders = process_results("BFS")
 
-    for puzzle in "4x4_01_00001.txt 4x4_01_00002.txt".split(" "):
+    for puzzle in puzzles:
         for order in orders:
             dfs = DFS(search_order=order)
             dim, lay = load_config(path.join("puzzles", puzzle))
@@ -86,6 +86,5 @@ if __name__ == "__main__":
     dfs_avg_whole, dfs_avg_orders = process_results("DFS")    
 
     plt.bar(range(1, 8), [mean(bfs_avg_whole["time"][i]) for i in range(1, 8)])
-    # plt.bar([1]], [mean(dfs_avg_whole["time"][i]) for i in range(1, 8)])
-    plt.bar([1], dfs_avg_whole["time"][1])
+    plt.bar(range(1, 8), [mean(dfs_avg_whole["time"][i]) for i in range(1, 8)])
     plt.show()

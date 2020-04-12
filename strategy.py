@@ -1,5 +1,5 @@
 from model import Model
-from collections import defaultdict
+from collections import defaultdict, deque
 from sys import setrecursionlimit
 
 
@@ -7,12 +7,13 @@ class Strategy():
     setrecursionlimit(10**5)
 
     def __init__(self, search_order="LRUD", max_depth=20, heuristic=None):
-        self.frontier = []
-        self.explored = []
+        self.frontier = deque()
+        self.explored = deque()
         self.frontier_hash = defaultdict(bool)
         self.explored_hash = defaultdict(bool)
-        self.zeros = []
-        self.path = [[]]
+        self.zeros = deque()
+        self.path = deque()
+        self.path.append([])
         self.model = Model(search_order=search_order, heuristic=heuristic)
         self.max_depth = max_depth
         self.current_depth = 0

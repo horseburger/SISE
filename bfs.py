@@ -17,7 +17,7 @@ class BFS(Strategy):
             self.explored_hash[sha256(self.model.current_state).hexdigest()] = True
             ops = self.model.get_operators()
 
-            path = self.path.pop(0)
+            path = self.path.popleft()
 
             for op in ops:
                 new_state, new_zero = self.model.get_neighbour_state(op)
@@ -31,10 +31,8 @@ class BFS(Strategy):
                     new_path.append(op)
                     self.path.append(new_path)
 
-            self.model.current_state = np.copy(self.frontier[0])
-            self.model.zero_position = self.zeros[0]
-            del self.frontier[0]
-            del self.zeros[0]
+            self.model.current_state = self.frontier.popleft()
+            self.model.zero_position = self.zeros.popleft()
 
             flag = self.model.is_solved()
 
