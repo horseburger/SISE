@@ -17,7 +17,6 @@ parser.add_argument("output", help="Result filename")
 parser.add_argument("info", help="Additional info filename")
 
 
-
 def load_config(filename):
     with open(filename, 'r') as f:
         dimensions = [int(num) for num in f.readline().strip('\n').split(' ')]
@@ -69,8 +68,8 @@ if __name__ == "__main__":
         dfs = DFS(search_order=args.parameter)
         dfs.model.load_layout(dimensions, layout)
         start = time.time()
-        dfs.run()
-        end = round((time.time() - start) * 1000, 3)
-        save_result(args.output, dfs.path[-1], len(dfs.path[-1]))
-        save_info(args.info, len(
-            dfs.path[-1]), len(dfs.frontier_hash), len(dfs.explored_hash), dfs.deepest, end)
+        if(dfs.run() != -1):
+            end = round((time.time() - start) * 1000, 3)
+            save_result(args.output, dfs.path[-1], len(dfs.path[-1]))
+            save_info(args.info, len(
+                dfs.path[-1]), len(dfs.frontier_hash), len(dfs.explored_hash), dfs.deepest, end)
