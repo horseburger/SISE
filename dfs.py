@@ -18,6 +18,7 @@ class DFS(Strategy):
             ops = self.model.get_operators()
 
             path = self.path.pop()
+            self.deepest = max(len(path), self.deepest)
 
             if not len(path) > self.max_depth - 1:
                 for op in ops:
@@ -43,6 +44,10 @@ class DFS(Strategy):
             del self.frontier[-1]
             del self.zeros[-1]
             flag = self.model.is_solved()
+        
+        
+        self.deepest = max(len(path), self.deepest)
+        
 
 
 if __name__ == "__main__":

@@ -68,8 +68,11 @@ if __name__ == "__main__":
         dfs = DFS(search_order=args.parameter)
         dfs.model.load_layout(dimensions, layout)
         start = time.time()
-        if(dfs.run() != -1):
-            end = round((time.time() - start) * 1000, 3)
+        r = dfs.run()
+        end = round((time.time() - start) * 1000, 3)
+        if not r:
             save_result(args.output, dfs.path[-1], len(dfs.path[-1]))
-            save_info(args.info, len(
-                dfs.path[-1]), len(dfs.frontier_hash), len(dfs.explored_hash), dfs.deepest, end)
+            save_info(args.info, len(dfs.path[-1]), len(dfs.frontier), len(dfs.explored), dfs.deepest, end)
+        else:
+            save_result(args.output, [], -1)
+            save_info(args.info, -1, len(dfs.frontier), len(dfs.explored), dfs.deepest, end)
