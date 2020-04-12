@@ -3,7 +3,7 @@ from random import randint, choice
 
 
 class Model:
-    def __init__(self, search_order="LRUD", heuristic=None):
+    def __init__(self, search_order="LRUD", heuristic=None, search_strategy="hamm"):
         self.target_state = np.array([[1, 2, 3, 4],
                                       [5, 6, 7, 8],
                                       [9, 10, 11, 12],
@@ -15,6 +15,7 @@ class Model:
         self.first_state = None
         self.first_zero = None
         self.search_order = search_order
+        self.search_strategy = search_strategy
         self.heuristic = heuristic
 
         self.__generate_state()
@@ -48,7 +49,8 @@ class Model:
         self.first_zero = self.zero_position
 
     def __swap(self, a, new_state):
-        new_state[self.zero_position], new_state[tuple(a)] = new_state[tuple(a)], new_state[self.zero_position]
+        new_state[self.zero_position], new_state[tuple(
+            a)] = new_state[tuple(a)], new_state[self.zero_position]
 
     def get_operators(self):
         allowed = []
@@ -93,6 +95,25 @@ class Model:
 
     def is_solved(self):
         return np.array_equal(self.current_state, self.target_state)
+
+    def get_f_value(self, next_state, depth):
+        if self.search_strategy == "hamm":
+            current = next_state.flatten()
+            target = self.target_state.flatten()
+            value = 0
+            for x in range(0, 15):
+                if(current[x] != target[x]):
+                    value += 1
+            return value
+
+        elif self.search_strategy == "manh":
+            print("pedał")
+            current = dict((j, (x, y)) for x, i in enumerate(
+                next_state) for y, j in enumerate(i))
+            target = dict((j, (x, y)) for x, i in enumerate(
+                self.target_state) for y, j in enumerate(i))
+            value = 0
+            return value
 
     def __str__(self):
         return """Current state:\n {}\n\nZero position:\n{}\n""".format(self.current_state, self.zero_position)
