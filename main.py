@@ -1,5 +1,6 @@
 from bfs import BFS
 from dfs import DFS
+from astr import ASTR
 import numpy as np
 import argparse
 from random import shuffle
@@ -62,7 +63,8 @@ if __name__ == "__main__":
         bfs.run()
         end = round((time.time() - start) * 1000, 3)
         save_result(args.output, bfs.path[0], len(bfs.path[0]))
-        save_info(args.info, len(bfs.path[0]), len(bfs.frontier) + len(bfs.explored), len(bfs.explored), len(bfs.path[0]), end)
+        save_info(args.info, len(bfs.path[0]), len(
+            bfs.frontier) + len(bfs.explored), len(bfs.explored), len(bfs.path[0]), end)
     elif args.strategy == 'dfs':
         dfs = DFS(search_order=args.parameter)
         dfs.model.load_layout(dimensions, layout)
@@ -71,7 +73,16 @@ if __name__ == "__main__":
         end = round((time.time() - start) * 1000, 3)
         if not r:
             save_result(args.output, dfs.path[-1], len(dfs.path[-1]))
-            save_info(args.info, len(dfs.path[-1]), len(dfs.frontier) + len(dfs.explored), len(dfs.explored), dfs.deepest, end)
-        else:
-            save_result(args.output, [], -1)
-            save_info(args.info, -1, len(dfs.frontier) + len(dfs.explored), len(dfs.explored), dfs.deepest, end)
+            save_info(args.info, len(
+                dfs.path[-1]), len(dfs.frontier_hash), len(dfs.explored_hash), dfs.deepest, end)
+        elif args.strategy == 'astr':
+            astr = ASTR(search_strategy=args.parameter)
+            astr.model.load_layout(dimensions, layout)
+            start = time.time()
+            if(astr.run() != -1):
+                end = round((time.time() - start) * 1000, 3)
+                save_result(args.output, astr.path[0], len(astr.path[0]))
+                save_info(args.info, len(
+                    astr.path[-1]), len(astr.path[0]), 0, 0, end)
+                save_info(args.info, len(dfs.path[-1]), len(dfs.frontier) + len(
+                    dfs.explored), len(dfs.explored), dfs.deepest, end)
