@@ -7,6 +7,7 @@ from os import listdir, makedirs, path
 from collections import defaultdict
 from time import time
 from statistics import mean
+import numpy as np
 
 
 orders = ["RDUL", "RDLU", "DRUL", "DRLU", "LUDR", "LURD", "ULDR", "ULRD"]
@@ -23,23 +24,28 @@ def process_results(algo):
     avg_whole = {key: defaultdict(list) for key in criterions}
     for crit in criterions:
         for l in range(1, 8):
-            # bfs_avg_whole[crit][l] = mean([results["BFS"][order][l] for order in orders])
             foo = []
             for order in orders:
                 foo += [results[algo][order][l][i][crit] for i in range(len(results[algo][order][l]))]
             avg_whole[crit][l] = foo
+    # {criterion: depth: order: }
     avg_orders = {key: defaultdict(dict) for key in criterions}
     for foo in avg_orders:
         # bfs_avg_orders[foo] = {key: defaultdict for key in range(1, 8)}
         for key in range(1, 8):
             avg_orders[foo][key] = {order: list() for order in orders}
 
+    # for crit in criterions:
+    #     for depth in avg_orders[crit]:
+    #         foo = []
+    #         for order in orders:
+    #             foo += [results[algo][order][depth][i][crit] for i in range(len(results[algo][order][depth]))]
+    #             avg_orders[crit][depth][order] = foo
+
     for crit in criterions:
         for depth in avg_orders[crit]:
-            foo = []
             for order in orders:
-                foo += [results[algo][order][depth][i][crit] for i in range(len(results[algo][order][depth]))]
-                avg_orders[crit][depth][order] = foo
+                avg_orders[crit][depth][order] = [results[algo][order][depth][i][crit] for i in range(len(results[algo][order][depth]))]
 
     return avg_whole, avg_orders
 
@@ -85,6 +91,27 @@ if __name__ == "__main__":
 
     dfs_avg_whole, dfs_avg_orders = process_results("DFS")    
 
-    plt.bar(range(1, 8), [mean(bfs_avg_whole["time"][i]) for i in range(1, 8)])
-    plt.bar(range(1, 8), [mean(dfs_avg_whole["time"][i]) for i in range(1, 8)])
+    # plt.bar(range(1, 8), [mean(bfs_avg_whole["time"][i]) for i in range(1, 8)])
+    # plt.bar(range(1, 8), [mean(dfs_avg_whole["time"][i]) for i in range(1, 8)])
+    # plt.show()
+
+    bar_width = 0.1
+    xs = [np.arange(1, 8)]
+    for i in range(1, 8):
+        xs.append([x + bar_width for x in xs[i - 1]])
+
+    ys = []
+    for order in orders:
+        ys.append([mean(bfs_avg_orders["time"][i][order]) for i in range(1, 8)])
+    print(ys)
+    
+    plt.xlabel("Depth")
+    plt.ylabel("Time")
+    for i in range(len(orders)):
+        plt.bar(xs[i], ys[i], edgecolor="black", width=bar_width, label=orders[i])
+    plt.legend()
+    # for crit in criterions:
+    #     plt.ylabel(crit)
+        
+    #     plt.show()
     plt.show()
