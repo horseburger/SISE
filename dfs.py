@@ -20,6 +20,7 @@ class DFS(Strategy):
             path = self.path.pop()
 
             if not len(path) > self.max_depth:
+                self.deepest = max((len(path), self.deepest))
                 for op in ops:
                     new_state, new_zero = self.model.get_neighbour_state(op)
                     new_state_hash = sha256(new_state).hexdigest()
@@ -45,6 +46,7 @@ class DFS(Strategy):
                 print('Solution not found')
                 return -1
 
+        self.deepest = max((len(self.path[-1]), self.deepest))
 
 if __name__ == "__main__":
     dfs = DFS(search_order="RDLU")

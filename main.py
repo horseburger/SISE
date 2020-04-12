@@ -3,10 +3,8 @@ from dfs import DFS
 import numpy as np
 import argparse
 from random import shuffle
-import sys
 import time
 
-sys.setrecursionlimit(10**5)
 # argument parser
 parser = argparse.ArgumentParser()
 parser.add_argument("strategy", help="Choose between bfs, dfs and astr", choices=[
@@ -18,7 +16,6 @@ parser.add_argument(
 parser.add_argument("output", help="Result filename")
 parser.add_argument("info", help="Additional info filename")
 
-args = parser.parse_args()
 
 
 def load_config(filename):
@@ -30,9 +27,9 @@ def load_config(filename):
     return dimensions, [int(num) for num in layout if num]
 
 
-def save_result(filename, result):
+def save_result(filename, result, l):
     with open(filename, 'w+') as f:
-        f.write(str(len(result)) + '\n')
+        f.write(str(l) + '\n')
         f.write(','.join(result))
 
 
@@ -56,8 +53,7 @@ def randomize_search_order():
 
 
 if __name__ == "__main__":
-
-    orders = ["RDUL", "RDLU", "DRUL", "DRLU", "LUDR", "LURD", "ULDR", "ULRD"]
+    args = parser.parse_args()
 
     dimensions, layout = load_config(args.start)
     if args.strategy == 'bfs':
@@ -66,26 +62,15 @@ if __name__ == "__main__":
         start = time.time()
         bfs.run()
         end = round((time.time() - start) * 1000, 3)
-        save_result(args.output, bfs.path[0])
+        save_result(args.output, bfs.path[0], len(bfs.path[0]))
         save_info(args.info, len(bfs.path[0]), len(
-            bfs.frontier), len(bfs.explored), bfs.max_depth, end)
-        # print(bfs.model.zero_position, bfs.path[0])
+            bfs.frontier), len(bfs.explored), len(bfs.path[0]), end)
     elif args.strategy == 'dfs':
         dfs = DFS(search_order=args.parameter)
         dfs.model.load_layout(dimensions, layout)
         start = time.time()
         dfs.run()
         end = round((time.time() - start) * 1000, 3)
-        save_result(args.output, dfs.path[-1])
+        save_result(args.output, dfs.path[-1], len(dfs.path[-1]))
         save_info(args.info, len(
-            dfs.path[-1]), len(dfs.frontier_hash), len(dfs.explored_hash), dfs.max_depth, end)
-    # start = time.time()
-    # for i in randomize_search_order():
-    #     bfs = BFS(search_order=i)
-    #     dims, lay = load_config("puzzles/4x4_07_00002.txt")
-    #     bfs.model.load_layout(dims, lay)
-    #     flag = bfs.run()
-    #     # print(bfs.model.first_state)
-    #     print(i, bfs.path[-1], flag)
-
-    # print(time.time() - start)
+            dfs.path[-1]), len(dfs.frontier_hash), len(dfs.explored_hash), dfs.deepest, end)
