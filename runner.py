@@ -10,6 +10,8 @@ from statistics import mean
 import numpy as np
 from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
 
+import json
+
 
 orders = ["RDUL", "RDLU", "DRUL", "DRLU", "LUDR", "LURD", "ULDR", "ULRD"]
 puzzles = listdir("./puzzles")
@@ -23,7 +25,6 @@ algos = ["BFS", "DFS", "A*"]
 
 
 def chunks(lst, n):
-    """Yield successive n-sized chunks from lst."""
     for i in range(0, len(lst), n):
         yield lst[i:i + n]
 
@@ -91,7 +92,7 @@ def run_dfs(p):
             if r:
                 result = {"path_length": -1, "frontier": len(dfs.frontier), "explored": len(dfs.explored), "depth": dfs.deepest, "time": t}
             else:
-                result = {"path_length": len(dfs.path[0]), "frontier": len(dfs.frontier), "explored": len(dfs.explored), "depth": dfs.deepest, "time": t}
+                result = {"path_length": len(dfs.path[-1]), "frontier": len(dfs.frontier) + len(dfs.explored), "explored": len(dfs.explored), "depth": len(dfs.path[-1]), "time": t}
 
             results["DFS"][order][depth].append(result)
 
@@ -121,7 +122,7 @@ def run_bfs(p):
 
             # get the depth from 4x4_depth_00000.txt
             depth = int(puzzle.split('_')[1])
-            result = {"path_length": len(bfs.path[0]), "frontier": len(bfs.frontier), "explored": len(bfs.explored), "depth": len(bfs.path[0]), "time": t}
+            result = {"path_length": len(bfs.path[0]), "frontier": len(bfs.frontier) + len(bfs.explored), "explored": len(bfs.explored), "depth": len(bfs.path[0]), "time": t}
 
             results["BFS"][order][depth].append(result)
             print("BFS progress: {}%".format(round((i/progress) * 100, 2)), end='\r', flush=True)
@@ -133,21 +134,34 @@ def run_bfs(p):
 
 
 if __name__ == "__main__":
+    print("# Running BFS...")
+    t = time()
     bfs_avg_whole, bfs_avg_orders = run_bfs(puzzles)
+    print("# BFS done in: {}s\n".format(round(time() - t, 3)))
 
+    with open("bfs_avg_whole.out", 'w') as f:
+        json.dump(bfs_avg_whole, f)
+    with open("bfs_avg_order.out", 'w') as f:
+        json.dump(bfs_avg_orders, f)
+
+    print("# Running DFS...")
     jobs = []
     foo = time()
     with ProcessPoolExecutor(max_workers=4) as executor:
         for chunk in list(chunks(puzzles, len(puzzles)//4)):
             jobs.append(executor.submit(run_dfs, chunk))
-    print('\n' + str(time() - foo))
+    print("# DFS done in: {}s\n".format(round(time() - foo, 3)))
     res = [i.result() for i in jobs]
 
 
 
     dfs_avg_whole, dfs_avg_orders = get_dfs_results(res)  
 
-    plt.grid() 
+    with open("dfs_avg_whole.out", 'w') as f:
+        json.dump(dfs_avg_whole, f)
+    with open("dfs_avg_orders.out", 'w') as f:
+        json.dump(dfs_avg_orders, f)
+
 
     bar_width = 0.1
     xs = [np.arange(1, len(orders))]
@@ -168,8 +182,8 @@ if __name__ == "__main__":
         for i in range(len(orders)):
             plt.bar(xs[i], ys[i], edgecolor="black", width=bar_width, label=orders[i])
         plt.legend()
-        # plt.savefig("bfs_orders_" + crit + ".png")
-        plt.show()
+        plt.savefig("bfs_orders_" + crit + ".png")
+        # plt.show()
         plt.clf()
 
     print("# Plotting DFS...")
@@ -178,6 +192,10 @@ if __name__ == "__main__":
         plt.xlabel("Depth")
         plt.title("DFS all orders")
         ys = []
+
+        if crit == "explored" or crit == "frontier" or crit == "time":
+            plt.yscale("log")
+
         for order in orders:
             ys.append([mean(dfs_avg_orders[crit][i][order]) for i in sorted(dfs_avg_orders[crit].keys())])
         
@@ -186,8 +204,8 @@ if __name__ == "__main__":
         for i in range(len(orders)):
             plt.bar(xs[i], ys[i], edgecolor="black", width=bar_width, label=orders[i])
         plt.legend()
-        # plt.savefig("dfs_orders_" + crit + ".png")
-        plt.show()
+        plt.savefig("dfs_orders_" + crit + ".png")
+        # plt.show()
         plt.clf()
 
     print("# Plotting all...")
@@ -202,6 +220,8 @@ if __name__ == "__main__":
         plt.xlabel("Depth")
         plt.title("All algos average")
         ys = {key: list() for key in algos}
+        if crit == "explored" or crit == "frontier" or crit == "time":
+            plt.yscale("log")
 
         ys["BFS"] = [mean(bfs_avg_whole[crit][depth]) for depth in sorted(bfs_avg_whole[crit])]
         ys["DFS"] = [mean(dfs_avg_whole[crit][depth]) for depth in sorted(dfs_avg_whole[crit])]
@@ -210,5 +230,6 @@ if __name__ == "__main__":
         plt.bar(xs[0], ys["BFS"], edgecolor="black", width=bar_width, label="BFS")
         plt.bar(xs[1], ys["DFS"], edgecolor="black", width=bar_width, label="DFS")
         plt.legend()
-        plt.show()
+        # plt.show()
+        plt.savefig("all_" + crit + ".png")
         plt.clf()
