@@ -10,8 +10,9 @@ class DFS(Strategy):
         Strategy.__init__(self, search_order=search_order)
 
     def run(self):
-        flag = self.model.is_solved()
-        while not flag:
+        if self.model.is_solved(self.model.current_state):
+            return []
+        while True:
             self.explored.append(np.copy(self.model.current_state))
             self.explored_hash[sha256(
                 self.model.current_state).hexdigest()] = True
@@ -23,6 +24,11 @@ class DFS(Strategy):
             if not len(path) > self.max_depth - 1:
                 for op in ops:
                     new_state, new_zero = self.model.get_neighbour_state(op)
+
+                    if self.model.is_solved(new_state):
+                        self.deepest = max(len(path) + 1, self.deepest)
+                        return path + [op]
+
                     new_state_hash = sha256(new_state).hexdigest()
                     if not self.frontier_hash[new_state_hash] and not self.explored_hash[new_state_hash]:
                         # add current state to frontier
@@ -43,12 +49,7 @@ class DFS(Strategy):
             self.frontier_hash[state_hash] = False
             del self.frontier[-1]
             del self.zeros[-1]
-            flag = self.model.is_solved()
         
-        
-        self.deepest = max(len(path), self.deepest)
-        
-
 
 if __name__ == "__main__":
     dfs = DFS(search_order="RDLU")

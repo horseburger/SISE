@@ -8,8 +8,9 @@ class BFS(Strategy):
         Strategy.__init__(self, search_order=search_order)
 
     def run(self):
-        flag = self.model.is_solved()
-        while not flag:
+        if self.model.is_solved(self.model.current_state):
+            return []
+        while True:
             if len(self.path[0]) > self.max_depth:
                 return -1
             
@@ -21,6 +22,8 @@ class BFS(Strategy):
 
             for op in ops:
                 new_state, new_zero = self.model.get_neighbour_state(op)
+                if self.model.is_solved(new_state):
+                    return path + [op]
                 new_state_hash = sha256(new_state).hexdigest()
 
                 if not self.frontier_hash[new_state_hash] and not self.explored_hash[new_state_hash]:
@@ -34,9 +37,7 @@ class BFS(Strategy):
             self.model.current_state = self.frontier.popleft()
             self.model.zero_position = self.zeros.popleft()
 
-            flag = self.model.is_solved()
-
-        return flag
+        return -1
 
 
 if __name__ == "__main__":

@@ -9,12 +9,13 @@ class ASTR(Strategy):
                           heuristic=None, search_strategy=search_strategy)
 
     def run(self):
-        flag = self.model.is_solved()
+        if self.model.is_solved(self.model.current_state):
+            return []
         path = []
         best_state = {}
         best_zero = {}
         best_move = {}
-        while not flag:
+        while True:
             self.explored.append(np.copy(self.model.current_state))
             self.explored_hash[sha256(
                 self.model.current_state).hexdigest()] = True
@@ -23,6 +24,10 @@ class ASTR(Strategy):
             ops = self.model.get_operators()
             for op in ops:
                 new_state, new_zero = self.model.get_neighbour_state(op)
+
+                if self.model.is_solved(new_state):
+                    return path + [op]
+
                 f_value = self.model.get_f_value(new_state, self.current_depth)
                 new_state_hash = sha256(new_state).hexdigest()
                 if f_value == 0:

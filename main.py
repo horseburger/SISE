@@ -60,29 +60,35 @@ if __name__ == "__main__":
         bfs = BFS(search_order=args.parameter)
         bfs.model.load_layout(dimensions, layout)
         start = time.time()
-        bfs.run()
+        path = bfs.run()
         end = round((time.time() - start) * 1000, 3)
-        save_result(args.output, bfs.path[0], len(bfs.path[0]))
-        save_info(args.info, len(bfs.path[0]), len(
-            bfs.frontier) + len(bfs.explored), len(bfs.explored), len(bfs.path[0]), end)
+        if path != -1:
+            save_result(args.output, path, len(path))
+            save_info(args.info, len(path), len(bfs.frontier) + len(bfs.explored), len(bfs.explored) + 1, len(path), end)
+        else:
+            save_result(args.output, [], -1)
+            save_info(args.info, -1, len(bfs.frontier) + len(bfs.explored), len(bfs.explored), max(sorted(bfs.path, key=lambda k: len(k))), end)
     elif args.strategy == 'dfs':
         dfs = DFS(search_order=args.parameter)
         dfs.model.load_layout(dimensions, layout)
         start = time.time()
-        r = dfs.run()
+        path = dfs.run()
         end = round((time.time() - start) * 1000, 3)
-        if not r:
-            save_result(args.output, dfs.path[-1], len(dfs.path[-1]))
-            save_info(args.info, len(
-                dfs.path[-1]), len(dfs.frontier_hash), len(dfs.explored_hash), dfs.deepest, end)
+        if path != -1:
+            save_result(args.output, path, len(path))
+            save_info(args.info, len(path), len(dfs.frontier) + len(dfs.explored), len(dfs.explored), dfs.deepest, end)
+        else:
+            save_result(args.output, [], -1)
+            save_info(args.info, -1, len(dfs.frontier) + len(dfs.explored), len(dfs.explored), dfs.deepest, end)
     elif args.strategy == 'astr':
         astr = ASTR(search_strategy=args.parameter)
         astr.model.load_layout(dimensions, layout)
         start = time.time()
-        if(astr.run() != -1):
-            end = round((time.time() - start) * 1000, 3)
-            save_result(args.output, astr.path[0], len(astr.path[0]))
-            save_info(args.info, len(
-                astr.path[-1]), len(astr.path[0]), 0, 0, end)
-            save_info(args.info, len(dfs.path[-1]), len(dfs.frontier) + len(
-                dfs.explored), len(dfs.explored), dfs.deepest, end)
+        path = astr.run()
+        end = round((time.time() - start) * 1000, 3)
+        if path != -1:
+            save_result(args.output, path, len(path))
+            save_info(args.info, len(path), len(astr.frontier) + len(astr.explored), len(astr.explored), astr.current_depth, end)
+        else:
+            save_result(args.output, [], -1)
+            save_info(args.info, -1, len(astr.frontier) + len(astr.explored), len(astr.explored), astr.current_depth, end)

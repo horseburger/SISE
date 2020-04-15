@@ -93,8 +93,8 @@ class Model:
 
         return new_state, tuple(tmp)
 
-    def is_solved(self):
-        return np.array_equal(self.current_state, self.target_state)
+    def is_solved(self, state):
+        return np.array_equal(self.target_state, state)
 
     def get_f_value(self, next_state, depth):
         if self.search_strategy == "hamm":

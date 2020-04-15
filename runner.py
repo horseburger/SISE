@@ -1,9 +1,11 @@
 import matplotlib.pyplot as plt
 from bfs import BFS
 from dfs import DFS
+from astr import ASTR
 from main import load_config, save_info, save_result
 
-from os import listdir, makedirs, path
+from os import listdir, makedirs
+import os
 from collections import defaultdict
 from time import time
 from statistics import mean
@@ -17,6 +19,8 @@ orders = ["RDUL", "RDLU", "DRUL", "DRLU", "LUDR", "LURD", "ULDR", "ULRD"]
 puzzles = listdir("./puzzles")
 criterions = ["path_length", "frontier", "explored", "depth", "time"]
 algos = ["BFS", "DFS", "A*"]
+# heuristics = ["hamm", "manh"]
+heuristics = ["hamm"]
 
 # # {alg: order: depth: criterions}
 # results = {key:defaultdict(dict) for key in "BFS DFS A*".split(' ')}
@@ -32,7 +36,10 @@ def init_results():
     # {alg: order: depth: criterions}
     results = {key:defaultdict(dict) for key in algos}
     for foo in results:
-        results[foo] = {key:defaultdict(list) for key in orders}
+        if foo == "A*":
+            results[foo] = {key: defaultdict(list) for key in heuristics}
+        else:
+            results[foo] = {key:defaultdict(list) for key in orders}
     return results
 
 
@@ -62,10 +69,11 @@ def process_results(algo, results):
 
 def merge_results(_results, algo):
     final = init_results()
+    loop = heuristics if algo == "A*" else orders
     for res in _results:
-        for order in orders:
-            for depth in res[algo][order]:
-                final[algo][order][depth] += res[algo][order][depth]
+        for l in loop:
+            for depth in res[algo][l]:
+                final[algo][l][depth] += res[algo][l][depth]
     
     return final
                 
@@ -81,18 +89,18 @@ def run_dfs(p):
     # for puzzle in ["4x4_01_00001.txt", "4x4_02_00001.txt", "4x4_03_00001.txt", "4x4_04_00001.txt", "4x4_05_00001.txt", "4x4_06_00001.txt", "4x4_07_00001.txt"]:
         for order in orders:
             dfs = DFS(search_order=order)
-            dim, lay = load_config(path.join("puzzles", puzzle))
+            dim, lay = load_config(os.path.join("puzzles", puzzle))
             dfs.model.load_layout(dim, lay)
             t = time()
-            r = dfs.run()
+            path = dfs.run()
             t = round((time() - t) * 1000, 3)
 
             depth = int(puzzle.split('_')[1])
             # print(r, puzzle, order)
-            if r:
-                result = {"path_length": -1, "frontier": len(dfs.frontier), "explored": len(dfs.explored), "depth": dfs.deepest, "time": t}
+            if path == -1:
+                result = {"path_length": -1, "frontier": len(dfs.frontier) + len(dfs.explored), "explored": len(dfs.explored), "depth": dfs.deepest, "time": t}
             else:
-                result = {"path_length": len(dfs.path[-1]), "frontier": len(dfs.frontier) + len(dfs.explored), "explored": len(dfs.explored), "depth": len(dfs.path[-1]), "time": t}
+                result = {"path_length": len(path), "frontier": len(dfs.frontier) + len(dfs.explored), "explored": len(dfs.explored), "depth": dfs.deepest, "time": t}
 
             results["DFS"][order][depth].append(result)
 
@@ -107,22 +115,18 @@ def run_bfs(p):
     for puzzle in puzzles:
         for order in orders:
             bfs = BFS(search_order=order)
-            dim, lay = load_config(path.join("puzzles", puzzle))
+            dim, lay = load_config(os.path.join("puzzles", puzzle))
             bfs.model.load_layout(dim, lay)
             t = time()
-            r = bfs.run()
+            path = bfs.run()
             t = round((time() - t) * 1000, 3)
-
-            # makedirs(path.join("output", "BFS", order), exist_ok=True)
-            # save_result(path.join("output", "BFS", order, puzzle + ".result"), bfs.path[0] if not r else [], len(bfs.path[0]) if not r else -1)
-
-            # save_info(path.join("output", "BFS", order, puzzle + ".info"), len(bfs.path[0]), len(bfs.frontier), len(bfs.explored), 
-                # len(bfs.path[0]) if not r else -1, t)
-
 
             # get the depth from 4x4_depth_00000.txt
             depth = int(puzzle.split('_')[1])
-            result = {"path_length": len(bfs.path[0]), "frontier": len(bfs.frontier) + len(bfs.explored), "explored": len(bfs.explored), "depth": len(bfs.path[0]), "time": t}
+            if path == -1:
+                result = {"path_length": -1, "frontier": len(bfs.frontier) + len(bfs.explored), "explored": len(bfs.explored), "depth": len(dfs.path[0]), "time": t}
+            else:
+                result = {"path_length": len(path), "frontier": len(bfs.frontier) + len(bfs.explored), "explored": len(bfs.explored), "depth": len(path), "time": t}
 
             results["BFS"][order][depth].append(result)
             print("BFS progress: {}%".format(round((i/progress) * 100, 2)), end='\r', flush=True)
@@ -130,8 +134,33 @@ def run_bfs(p):
     
     # avg_whole, avg_orders
     return process_results("BFS", results)
-    print('\n')
 
+def run_astr(p):
+    results = init_results()
+    progress = len(puzzles) * len(heuristics)
+    i = 0
+    for puzzle in puzzles:
+        for heur in heuristics:
+            astr = ASTR(search_strategy=heur)
+            dim, lay = load_config(os.path.join("puzzles", puzzle))
+            astr.model.load_layout(dim, lay)
+            t = time()
+            path = astr.run()
+            t = round((time() - t) * 1000, 3)
+
+            # get the depth from 4x4_depth_00000.txt
+            depth = int(puzzle.split('_')[1])
+            if path == -1:
+                result = {"path_length": -1, "frontier": len(astr.frontier) + len(astr.explored), "explored": len(astr.explored), "depth": len(path), "time": t}
+            else:
+                result = {"path_length": len(path), "frontier": len(astr.frontier) + len(astr.explored), "explored": len(astr.explored), "depth": len(path), "time": t}
+
+            results["A*"][heur][depth].append(result)
+            print("A* progress: {}%".format(round((i/progress) * 100, 2)), end='\r', flush=True)
+            i += 1
+    
+    # avg_whole, avg_orders
+    return process_results("A*", results)
 
 if __name__ == "__main__":
     print("# Running BFS...")
@@ -161,6 +190,11 @@ if __name__ == "__main__":
         json.dump(dfs_avg_whole, f)
     with open("dfs_avg_orders.out", 'w') as f:
         json.dump(dfs_avg_orders, f)
+
+    # print("# Running A*...")
+    # t = time()
+    # astr_avg_whole, astr_avg_orders = run_astr(puzzles)
+    # print("# A* done in: {}s\n".format(round(time() - t, 3)))
 
 
     bar_width = 0.1
@@ -208,6 +242,27 @@ if __name__ == "__main__":
         # plt.show()
         plt.clf()
 
+    # print("# Plotting A*...")
+    # for crit in criterions:
+    #     plt.xlabel("Depth")
+    #     plt.title("DFS all orders")
+    #     ys = []
+
+    #     if crit == "explored" or crit == "frontier" or crit == "time":
+    #         plt.yscale("log")
+
+    #     for heur in heuristics:
+    #         ys.append([mean(astr_avg_orders[crit][i][heur]) for i in sorted(astr_avg_orders[crit].keys())])
+        
+
+    #     plt.ylabel(crit.capitalize())
+    #     for i in range(len(heuristics)):
+    #         plt.bar(xs[i], ys[i], edgecolor="black", width=bar_width, label=heuristics[i])
+    #     plt.legend()
+    #     plt.savefig("astr_" + crit + ".png")
+    #     # plt.show()
+    #     plt.clf()
+
     print("# Plotting all...")
 
 
@@ -225,10 +280,12 @@ if __name__ == "__main__":
 
         ys["BFS"] = [mean(bfs_avg_whole[crit][depth]) for depth in sorted(bfs_avg_whole[crit])]
         ys["DFS"] = [mean(dfs_avg_whole[crit][depth]) for depth in sorted(dfs_avg_whole[crit])]
+        # ys["A*"] = [mean(astr_avg_whole[crit][depth]) for depth in sorted(astr_avg_whole[crit])]
 
         plt.ylabel(crit.capitalize())
         plt.bar(xs[0], ys["BFS"], edgecolor="black", width=bar_width, label="BFS")
         plt.bar(xs[1], ys["DFS"], edgecolor="black", width=bar_width, label="DFS")
+        # plt.bar(xs[2], ys["A*"], edgecolor="black", width=bar_width, label="A*")
         plt.legend()
         # plt.show()
         plt.savefig("all_" + crit + ".png")
