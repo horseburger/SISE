@@ -75,14 +75,14 @@ if __name__ == "__main__":
             save_result(args.output, dfs.path[-1], len(dfs.path[-1]))
             save_info(args.info, len(
                 dfs.path[-1]), len(dfs.frontier_hash), len(dfs.explored_hash), dfs.deepest, end)
-        elif args.strategy == 'astr':
-            astr = ASTR(search_strategy=args.parameter)
-            astr.model.load_layout(dimensions, layout)
-            start = time.time()
-            if(astr.run() != -1):
-                end = round((time.time() - start) * 1000, 3)
-                save_result(args.output, astr.path[0], len(astr.path[0]))
-                save_info(args.info, len(
-                    astr.path[-1]), len(astr.path[0]), 0, 0, end)
-                save_info(args.info, len(dfs.path[-1]), len(dfs.frontier) + len(
-                    dfs.explored), len(dfs.explored), dfs.deepest, end)
+    elif args.strategy == 'astr':
+        astr = ASTR(search_strategy=args.parameter)
+        astr.model.load_layout(dimensions, layout)
+        start = time.time()
+        if(astr.run() != -1):
+            end = round((time.time() - start) * 1000, 3)
+            save_result(args.output, astr.path[0], len(astr.path[0]))
+            save_info(args.info, len(
+                astr.path[-1]), len(astr.path[0]), 0, 0, end)
+            save_info(args.info, len(dfs.path[-1]), len(dfs.frontier) + len(
+                dfs.explored), len(dfs.explored), dfs.deepest, end)
