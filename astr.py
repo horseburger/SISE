@@ -17,23 +17,17 @@ class ASTR(Strategy):
         best_move = {}
         while True:
             self.explored.append(np.copy(self.model.current_state))
-            self.explored_hash[sha256(
-                self.model.current_state).hexdigest()] = True
-            best_f_value = self.model.get_f_value(
-                self.model.current_state, self.current_depth)
+            self.explored_hash[sha256(self.model.current_state).hexdigest()] = True
+            best_f_value = 120
             ops = self.model.get_operators()
             for op in ops:
                 new_state, new_zero = self.model.get_neighbour_state(op)
-
-                if self.model.is_solved(new_state):
-                    return path + [op]
-
                 f_value = self.model.get_f_value(new_state, self.current_depth)
                 new_state_hash = sha256(new_state).hexdigest()
                 if f_value == 0:
                     self.path[0].append(op)
-                    return 0
-                elif f_value < best_f_value and not self.explored_hash[new_state_hash]:
+                    return self.path[0]
+                elif f_value <= best_f_value and not self.explored_hash[new_state_hash]:
                     best_state[f_value] = new_state
                     best_zero[f_value] = new_zero
                     best_move[f_value] = op
