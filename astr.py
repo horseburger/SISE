@@ -34,7 +34,7 @@ class ASTR(Strategy):
                     self.path[0].append(op)
                     return self.path[0]
 
-                elif f_value <= best_f_value and not self.explored_hash[new_state_hash]:
+                elif f_value < best_f_value and not self.explored_hash[new_state_hash]:
                     best_f_value = f_value
                     best_state = new_state
                     best_zero = new_zero

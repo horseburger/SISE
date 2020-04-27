@@ -107,12 +107,11 @@ class Model:
             return value
 
         elif self.search_strategy == "manh":
-            print("pedał")
-            current = dict((j, (x, y)) for x, i in enumerate(
-                next_state) for y, j in enumerate(i))
-            target = dict((j, (x, y)) for x, i in enumerate(
-                self.target_state) for y, j in enumerate(i))
+            current = dict((j, (x, y)) for x, i in enumerate(next_state) for y, j in enumerate(i))
+            target = dict((j, (x, y)) for x, i in enumerate(self.target_state) for y, j in enumerate(i))
             value = 0
+            for x in range(0, 15):
+                value += (current[x][0] - target[x][0]) + (current[x][1] - target[x][1])
             return value
 
     def __str__(self):
