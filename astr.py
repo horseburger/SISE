@@ -16,7 +16,6 @@ class ASTR(Strategy):
             return []
         path = []
         openStates = PriorityQueue()
-        #closedStates = {}
         best_move = None
 
         while openStates:
@@ -32,17 +31,16 @@ class ASTR(Strategy):
                 if self.model.is_solved(new_state):
                     return path + [op]
 
-                f_value = self.model.get_f_value(new_state)
+                f_value = self.model.get_f_value(new_state) + self.current_depth
 
-                f_value += self.current_depth
                 if not self.explored_hash[new_state_hash] and not self.frontier_hash[new_state_hash]:
                     self.frontier_hash[new_state_hash] = True
-                    openStates.put((f_value, [new_state_hash, new_state, new_zero, path + [op]]))
+                    openStates.put((f_value, [new_state_hash, new_state, new_zero, path + [op], self.current_depth]))
 
             key = openStates.get()[1]
             self.frontier_hash[key[0]] = False
             self.model.current_state = key[1]
             self.model.zero_position = key[2]
             path = key[3]
-            #openStates.remove(key)
+            self.current_depth = key[4]
             self.current_depth += 1

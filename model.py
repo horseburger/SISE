@@ -101,8 +101,8 @@ class Model:
             current = next_state.flatten()
             target = self.target_state.flatten()
             value = 0
-            for x in range(0, 15):
-                if current[x] != target[x]:
+            for x in range(1, 15):
+                if current[x] and current[x] != target[x]:
                     value += 1
             return value
 
@@ -110,7 +110,7 @@ class Model:
             current = dict((j, (x, y)) for x, i in enumerate(next_state) for y, j in enumerate(i))
             target = dict((j, (x, y)) for x, i in enumerate(self.target_state) for y, j in enumerate(i))
             value = 0
-            for x in range(0, 15):
+            for x in range(1, 15):
                 value += abs(current[x][0] - target[x][0]) + abs(current[x][1] - target[x][1])
             return value
 
