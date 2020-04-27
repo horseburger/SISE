@@ -20,7 +20,7 @@ class ASTR(Strategy):
             self.explored.append(np.copy(self.model.current_state))
             self.explored_hash[sha256(self.model.current_state).hexdigest()] = True
 
-            best_f_value = 120
+            best_f_value = 241
 
             ops = self.model.get_operators()
 
@@ -34,12 +34,11 @@ class ASTR(Strategy):
                     self.path[0].append(op)
                     return self.path[0]
 
-                elif f_value < best_f_value and not self.explored_hash[new_state_hash]:
+                elif not self.explored_hash[new_state_hash] and f_value < best_f_value:
                     best_f_value = f_value
                     best_state = new_state
                     best_zero = new_zero
                     best_move = op
-
             self.path[0].append(best_move)
             self.model.current_state = np.copy(best_state)
             self.model.zero_position = best_zero
