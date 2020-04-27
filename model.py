@@ -96,7 +96,7 @@ class Model:
     def is_solved(self, state):
         return np.array_equal(self.target_state, state)
 
-    def get_f_value(self, next_state, depth):
+    def get_f_value(self, next_state):
         if self.search_strategy == "hamm":
             current = next_state.flatten()
             target = self.target_state.flatten()

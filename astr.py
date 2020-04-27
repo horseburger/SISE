@@ -11,9 +11,9 @@ class ASTR(Strategy):
     def run(self):
         if self.model.is_solved(self.model.current_state):
             return []
-
-        best_state = self.model.current_state
-        best_zero = self.model.zero_position
+        path = []
+        openStates = []
+        closedStates = {}
         best_move = None
 
         while True:
@@ -28,18 +28,20 @@ class ASTR(Strategy):
                 new_state, new_zero = self.model.get_neighbour_state(op)
                 new_state_hash = sha256(new_state).hexdigest()
 
-                f_value = self.model.get_f_value(new_state, self.current_depth)
+                f_value = self.model.get_f_value(new_state)
 
                 if f_value == 0:
-                    self.path[0].append(op)
-                    return self.path[0]
+                    return path + [op]
 
-                elif not self.explored_hash[new_state_hash] and f_value < best_f_value:
-                    best_f_value = f_value
-                    best_state = new_state
-                    best_zero = new_zero
-                    best_move = op
-            self.path[0].append(best_move)
-            self.model.current_state = np.copy(best_state)
-            self.model.zero_position = best_zero
+                f_value += self.current_depth
+                if not self.explored_hash[new_state_hash] and not self.frontier_hash[new_state_hash] and f_value < best_f_value:
+                    self.frontier_hash[new_state_hash] = True
+                    openStates.append([f_value, new_state_hash, new_state, new_zero, path + [op]])
+
+            sorted(openStates, key=lambda x: x[0])
+            self.frontier_hash[openStates[0][1]] = False
+            self.model.current_state = np.copy(openStates[0][2])
+            self.model.zero_position = openStates[0][3]
+            path = openStates[0][4]
+            del openStates[0]
             self.current_depth += 1
