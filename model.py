@@ -102,7 +102,7 @@ class Model:
             target = self.target_state.flatten()
             value = 0
             for x in range(0, 15):
-                if(current[x] != target[x]):
+                if current[x] != target[x]:
                     value += 1
             return value
 

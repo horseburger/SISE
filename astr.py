@@ -1,6 +1,8 @@
 from strategy import Strategy
 import numpy as np
 from hashlib import sha256
+from queue import PriorityQueue
+from time import time
 
 
 class ASTR(Strategy):
@@ -9,18 +11,17 @@ class ASTR(Strategy):
                           heuristic=None, search_strategy=search_strategy)
 
     def run(self):
+        start = time()
         if self.model.is_solved(self.model.current_state):
             return []
         path = []
-        openStates = []
-        closedStates = {}
+        openStates = PriorityQueue()
+        #closedStates = {}
         best_move = None
 
-        while True:
+        while openStates:
             self.explored.append(np.copy(self.model.current_state))
             self.explored_hash[sha256(self.model.current_state).hexdigest()] = True
-
-            best_f_value = 241
 
             ops = self.model.get_operators()
 
@@ -28,20 +29,20 @@ class ASTR(Strategy):
                 new_state, new_zero = self.model.get_neighbour_state(op)
                 new_state_hash = sha256(new_state).hexdigest()
 
-                f_value = self.model.get_f_value(new_state)
-
-                if f_value == 0:
+                if self.model.is_solved(new_state):
                     return path + [op]
 
-                f_value += self.current_depth
-                if not self.explored_hash[new_state_hash] and not self.frontier_hash[new_state_hash] and f_value < best_f_value:
-                    self.frontier_hash[new_state_hash] = True
-                    openStates.append([f_value, new_state_hash, new_state, new_zero, path + [op]])
+                f_value = self.model.get_f_value(new_state)
 
-            sorted(openStates, key=lambda x: x[0])
-            self.frontier_hash[openStates[0][1]] = False
-            self.model.current_state = np.copy(openStates[0][2])
-            self.model.zero_position = openStates[0][3]
-            path = openStates[0][4]
-            del openStates[0]
+                f_value += self.current_depth
+                if not self.explored_hash[new_state_hash] and not self.frontier_hash[new_state_hash]:
+                    self.frontier_hash[new_state_hash] = True
+                    openStates.put((f_value, [new_state_hash, new_state, new_zero, path + [op]]))
+
+            key = openStates.get()[1]
+            self.frontier_hash[key[0]] = False
+            self.model.current_state = key[1]
+            self.model.zero_position = key[2]
+            path = key[3]
+            #openStates.remove(key)
             self.current_depth += 1
