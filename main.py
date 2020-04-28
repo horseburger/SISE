@@ -30,7 +30,7 @@ def load_config(filename):
 def save_result(filename, result, l):
     with open(filename, 'w+') as f:
         f.write(str(l) + '\n')
-        f.write(','.join(result))
+        f.write(''.join(result))
 
 
 def save_info(filename, result_length, frontier_length, explored_length, max_depth, time):

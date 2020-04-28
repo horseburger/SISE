@@ -12,6 +12,7 @@ class DFS(Strategy):
     def run(self):
         if self.model.is_solved(self.model.current_state):
             return []
+
         while True:
             self.explored.append(np.copy(self.model.current_state))
             self.explored_hash[sha256(
@@ -21,15 +22,19 @@ class DFS(Strategy):
             path = self.path.pop()
             
 
-            if not len(path) >= self.max_depth + 2:
+            if not len(path) >= self.max_depth:
+
                 for op in ops:
+                    if path and not self.is_not_reversed(path, op): 
+                        continue
+
                     new_state, new_zero = self.model.get_neighbour_state(op)
 
                     if self.model.is_solved(new_state):
                         return path + [op]
 
                     new_state_hash = sha256(new_state).hexdigest()
-                    if not len(path) >= self.max_depth + 1 and not self.frontier_hash[new_state_hash] and not self.explored_hash[new_state_hash]:
+                    if not self.frontier_hash[new_state_hash] and not self.explored_hash[new_state_hash]:
                         # add current state to frontier
                         self.frontier.append(new_state)
                         self.frontier_hash[new_state_hash] = True
@@ -40,6 +45,8 @@ class DFS(Strategy):
                         self.deepest = max(len(new_path), self.deepest)
                         new_path.append(op)
                         self.path.append(new_path)
+            else:
+                self.deepest = self.max_depth
             if not len(self.frontier) and len(self.explored) and not len(self.path):
                 # print('Solution not found')
                 return -1
@@ -49,6 +56,17 @@ class DFS(Strategy):
             self.frontier_hash[state_hash] = False
             del self.frontier[-1]
             del self.zeros[-1]
+    
+    def is_not_reversed(self, path, move):
+        if path[-1] == 'D' and move == 'U':
+            return False
+        if path[-1] ==  'U' and move == 'D':
+            return False
+        if path[-1] == 'R' and move == 'L':
+            return False
+        if path[-1] == 'L' and move == 'R':
+            return False
+        return True
         
 
 if __name__ == "__main__":
