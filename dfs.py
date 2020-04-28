@@ -21,7 +21,7 @@ class DFS(Strategy):
             path = self.path.pop()
             self.deepest = max(len(path), self.deepest)
 
-            if not len(path) > self.max_depth - 1:
+            if not len(path) >= self.max_depth - 1:
                 for op in ops:
                     new_state, new_zero = self.model.get_neighbour_state(op)
 
