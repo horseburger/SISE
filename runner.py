@@ -20,7 +20,7 @@ puzzles = listdir("./puzzles")
 criterions = ["path_length", "frontier", "explored", "depth", "time"]
 algos = ["BFS", "DFS", "A*"]
 # heuristics = ["hamm", "manh"]
-heuristics = ["hamm"]
+heuristics = ["hamm", "manh"]
 
 # # {alg: order: depth: criterions}
 # results = {key:defaultdict(dict) for key in "BFS DFS A*".split(' ')}
@@ -45,9 +45,10 @@ def init_results():
 
 def process_results(algo, results):
     # {criterion: depth: []}
+    vars = heuristics if algo == "A*" else orders
     avg_whole = {key: defaultdict(list) for key in criterions}
     for crit in criterions:
-        for order in orders:
+        for order in vars:
             foo = []
             for l in results[algo][order].keys():
                 avg_whole[crit][l] = [results[algo][order][l][i][crit] for i in range(len(results[algo][order][l]))]
@@ -58,11 +59,11 @@ def process_results(algo, results):
         # get the depth values
         bar = list(results[algo].items())[0][0]
         for key in results[algo][bar].keys():
-            avg_orders[foo][key] = {order: list() for order in orders}
+            avg_orders[foo][key] = {order: list() for order in vars}
 
     for crit in criterions:
         for depth in avg_orders[crit]:
-            for order in orders:
+            for order in vars:
                 avg_orders[crit][depth][order] = [results[algo][order][depth][i][crit] for i in range(len(results[algo][order][depth]))]
 
     return avg_whole, avg_orders
@@ -85,8 +86,8 @@ def run_dfs(p):
 
     i = 0
     progress = len(p) * 8
-    for puzzle in p:
-    # for puzzle in ["4x4_01_00001.txt", "4x4_02_00001.txt", "4x4_03_00001.txt", "4x4_04_00001.txt", "4x4_05_00001.txt", "4x4_06_00001.txt", "4x4_07_00001.txt"]:
+    # for puzzle in p:
+    for puzzle in ["4x4_01_00001.txt", "4x4_02_00001.txt", "4x4_03_00001.txt", "4x4_04_00001.txt", "4x4_05_00001.txt", "4x4_06_00001.txt", "4x4_07_00001.txt"]:
         for order in orders:
             dfs = DFS(search_order=order)
             dim, lay = load_config(os.path.join("puzzles", puzzle))
@@ -124,7 +125,7 @@ def run_bfs(p):
             # get the depth from 4x4_depth_00000.txt
             depth = int(puzzle.split('_')[1])
             if path == -1:
-                result = {"path_length": -1, "frontier": len(bfs.frontier) + len(bfs.explored), "explored": len(bfs.explored), "depth": len(dfs.path[0]), "time": t}
+                result = {"path_length": -1, "frontier": len(bfs.frontier) + len(bfs.explored), "explored": len(bfs.explored), "depth": len(bfs.path[0]), "time": t}
             else:
                 result = {"path_length": len(path), "frontier": len(bfs.frontier) + len(bfs.explored), "explored": len(bfs.explored), "depth": len(path), "time": t}
 
@@ -191,10 +192,10 @@ if __name__ == "__main__":
     with open("dfs_avg_orders.out", 'w') as f:
         json.dump(dfs_avg_orders, f)
 
-    # print("# Running A*...")
-    # t = time()
-    # astr_avg_whole, astr_avg_orders = run_astr(puzzles)
-    # print("# A* done in: {}s\n".format(round(time() - t, 3)))
+    print("# Running A*...")
+    t = time()
+    astr_avg_whole, astr_avg_orders = run_astr(puzzles)
+    print("# A* done in: {}s\n".format(round(time() - t, 3)))
 
 
     bar_width = 0.1
@@ -242,26 +243,26 @@ if __name__ == "__main__":
         # plt.show()
         plt.clf()
 
-    # print("# Plotting A*...")
-    # for crit in criterions:
-    #     plt.xlabel("Depth")
-    #     plt.title("DFS all orders")
-    #     ys = []
+    print("# Plotting A*...")
+    for crit in criterions:
+        plt.xlabel("Depth")
+        plt.title("DFS all orders")
+        ys = []
 
-    #     if crit == "explored" or crit == "frontier" or crit == "time":
-    #         plt.yscale("log")
+        # if crit == "explored" or crit == "frontier" or crit == "time":
+        #     plt.yscale("log")
 
-    #     for heur in heuristics:
-    #         ys.append([mean(astr_avg_orders[crit][i][heur]) for i in sorted(astr_avg_orders[crit].keys())])
+        for heur in heuristics:
+            ys.append([mean(astr_avg_orders[crit][i][heur]) for i in sorted(astr_avg_orders[crit].keys())])
         
 
-    #     plt.ylabel(crit.capitalize())
-    #     for i in range(len(heuristics)):
-    #         plt.bar(xs[i], ys[i], edgecolor="black", width=bar_width, label=heuristics[i])
-    #     plt.legend()
-    #     plt.savefig("astr_" + crit + ".png")
-    #     # plt.show()
-    #     plt.clf()
+        plt.ylabel(crit.capitalize())
+        for i in range(len(heuristics)):
+            plt.bar(xs[i], ys[i], edgecolor="black", width=bar_width, label=heuristics[i])
+        plt.legend()
+        plt.savefig("astr_" + crit + ".png")
+        # plt.show()
+        plt.clf()
 
     print("# Plotting all...")
 
@@ -280,12 +281,12 @@ if __name__ == "__main__":
 
         ys["BFS"] = [mean(bfs_avg_whole[crit][depth]) for depth in sorted(bfs_avg_whole[crit])]
         ys["DFS"] = [mean(dfs_avg_whole[crit][depth]) for depth in sorted(dfs_avg_whole[crit])]
-        # ys["A*"] = [mean(astr_avg_whole[crit][depth]) for depth in sorted(astr_avg_whole[crit])]
+        ys["A*"] = [mean(astr_avg_whole[crit][depth]) for depth in sorted(astr_avg_whole[crit])]
 
         plt.ylabel(crit.capitalize())
         plt.bar(xs[0], ys["BFS"], edgecolor="black", width=bar_width, label="BFS")
         plt.bar(xs[1], ys["DFS"], edgecolor="black", width=bar_width, label="DFS")
-        # plt.bar(xs[2], ys["A*"], edgecolor="black", width=bar_width, label="A*")
+        plt.bar(xs[2], ys["A*"], edgecolor="black", width=bar_width, label="A*")
         plt.legend()
         # plt.show()
         plt.savefig("all_" + crit + ".png")
