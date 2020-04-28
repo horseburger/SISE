@@ -19,18 +19,17 @@ class DFS(Strategy):
             ops = self.model.get_operators()
 
             path = self.path.pop()
-            self.deepest = max(len(path), self.deepest)
+            
 
-            if not len(path) >= self.max_depth - 1:
+            if not len(path) >= self.max_depth + 2:
                 for op in ops:
                     new_state, new_zero = self.model.get_neighbour_state(op)
 
                     if self.model.is_solved(new_state):
-                        self.deepest = max(len(path) + 1, self.deepest)
                         return path + [op]
 
                     new_state_hash = sha256(new_state).hexdigest()
-                    if not self.frontier_hash[new_state_hash] and not self.explored_hash[new_state_hash]:
+                    if not len(path) >= self.max_depth + 1 and not self.frontier_hash[new_state_hash] and not self.explored_hash[new_state_hash]:
                         # add current state to frontier
                         self.frontier.append(new_state)
                         self.frontier_hash[new_state_hash] = True
@@ -38,6 +37,7 @@ class DFS(Strategy):
                         self.zeros.append(new_zero)
                         # add operation to path
                         new_path = list(path)
+                        self.deepest = max(len(new_path), self.deepest)
                         new_path.append(op)
                         self.path.append(new_path)
             if not len(self.frontier) and len(self.explored) and not len(self.path):
