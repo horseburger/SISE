@@ -24,7 +24,7 @@ class ASTR(Strategy):
 
             ops = self.model.get_operators()
 
-            max_f = 241
+            #max_f = 241
             for op in ops:
                 new_state, new_zero = self.model.get_neighbour_state(op)
                 new_state_hash = sha256(new_state).hexdigest()
@@ -34,7 +34,7 @@ class ASTR(Strategy):
 
                 f_value = self.model.get_f_value(new_state) + self.current_depth
 
-                if not self.explored_hash[new_state_hash] and not self.frontier_hash[new_state_hash] and f_value <= max_f:
+                if not self.explored_hash[new_state_hash] and not self.frontier_hash[new_state_hash]:# and f_value <= max_f:
                     max_f = f_value
                     self.frontier_hash[new_state_hash] = True
                     openStates.put((f_value, [new_state_hash, new_state, new_zero, path + [op], self.current_depth]))
