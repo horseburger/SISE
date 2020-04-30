@@ -99,9 +99,9 @@ def run_dfs(p):
             depth = int(puzzle.split('_')[1])
             # print(r, puzzle, order)
             if path == -1:
-                result = {"path_length": -1, "frontier": len(dfs.frontier) + len(dfs.explored), "explored": len(dfs.explored), "depth": dfs.deepest, "time": t}
-            else:
-                result = {"path_length": len(path), "frontier": len(dfs.frontier) + len(dfs.explored), "explored": len(dfs.explored), "depth": dfs.deepest, "time": t}
+                continue
+
+            result = {"path_length": len(path), "frontier": len(dfs.frontier) + len(dfs.explored), "explored": len(dfs.explored), "depth": dfs.deepest, "time": t}
 
             results["DFS"][order][depth].append(result)
 
@@ -125,9 +125,9 @@ def run_bfs(p):
             # get the depth from 4x4_depth_00000.txt
             depth = int(puzzle.split('_')[1])
             if path == -1:
-                result = {"path_length": -1, "frontier": len(bfs.frontier) + len(bfs.explored), "explored": len(bfs.explored), "depth": len(bfs.path[0]), "time": t}
-            else:
-                result = {"path_length": len(path), "frontier": len(bfs.frontier) + len(bfs.explored), "explored": len(bfs.explored), "depth": len(path), "time": t}
+                continue
+
+            result = {"path_length": len(path), "frontier": len(bfs.frontier) + len(bfs.explored), "explored": len(bfs.explored), "depth": len(path), "time": t}
 
             results["BFS"][order][depth].append(result)
             print("BFS progress: {}%".format(round((i/progress) * 100, 2)), end='\r', flush=True)
@@ -152,9 +152,9 @@ def run_astr(p):
             # get the depth from 4x4_depth_00000.txt
             depth = int(puzzle.split('_')[1])
             if path == -1:
-                result = {"path_length": -1, "frontier": len(astr.frontier) + len(astr.explored), "explored": len(astr.explored), "depth": len(path), "time": t}
-            else:
-                result = {"path_length": len(path), "frontier": len(astr.frontier) + len(astr.explored), "explored": len(astr.explored), "depth": len(path), "time": t}
+                continue
+
+            result = {"path_length": len(path), "frontier": len(astr.frontier) + len(astr.explored), "explored": len(astr.explored), "depth": len(path), "time": t}
 
             results["A*"][heur][depth].append(result)
             print("A* progress: {}%".format(round((i/progress) * 100, 2)), end='\r', flush=True)
@@ -177,8 +177,8 @@ if __name__ == "__main__":
     print("# Running DFS...")
     jobs = []
     foo = time()
-    with ProcessPoolExecutor(max_workers=4) as executor:
-        for chunk in list(chunks(puzzles, len(puzzles)//4)):
+    with ProcessPoolExecutor(max_workers=15) as executor:
+        for chunk in list(chunks(puzzles, len(puzzles)//15)):
             jobs.append(executor.submit(run_dfs, chunk))
     print("# DFS done in: {}s\n".format(round(time() - foo, 3)))
     res = [i.result() for i in jobs]
