@@ -246,7 +246,7 @@ if __name__ == "__main__":
     print("# Plotting A*...")
     for crit in criterions:
         plt.xlabel("Depth")
-        plt.title("DFS all orders")
+        plt.title("A* all orders")
         ys = []
 
         # if crit == "explored" or crit == "frontier" or crit == "time":
