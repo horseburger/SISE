@@ -27,6 +27,7 @@ class DFS(Strategy):
                     new_state, new_zero = self.model.get_neighbour_state(op)
 
                     if self.model.is_solved(new_state):
+                        self.deepest = max(len(path) + 1, self.deepest)
                         return path + [op]
 
                     new_state_hash = sha256(new_state).hexdigest()

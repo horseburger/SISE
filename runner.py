@@ -86,8 +86,8 @@ def run_dfs(p):
 
     i = 0
     progress = len(p) * 8
-    # for puzzle in p:
-    for puzzle in ["4x4_01_00001.txt", "4x4_02_00001.txt", "4x4_03_00001.txt", "4x4_04_00001.txt", "4x4_05_00001.txt", "4x4_06_00001.txt", "4x4_07_00001.txt"]:
+    for puzzle in p:
+    # for puzzle in ["4x4_01_00001.txt", "4x4_02_00001.txt", "4x4_03_00001.txt", "4x4_04_00001.txt", "4x4_05_00001.txt", "4x4_06_00001.txt", "4x4_07_00001.txt"]:
         for order in orders:
             dfs = DFS(search_order=order)
             dim, lay = load_config(os.path.join("puzzles", puzzle))
