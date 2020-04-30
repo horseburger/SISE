@@ -23,11 +23,7 @@ class DFS(Strategy):
             
 
             if not len(path) >= self.max_depth:
-
                 for op in ops:
-                    if path and not self.is_not_reversed(path, op): 
-                        continue
-
                     new_state, new_zero = self.model.get_neighbour_state(op)
 
                     if self.model.is_solved(new_state):
@@ -46,7 +42,7 @@ class DFS(Strategy):
                         new_path.append(op)
                         self.path.append(new_path)
             else:
-                self.deepest = self.max_depth
+                self.deepest = len(path)
             if not len(self.frontier) and len(self.explored) and not len(self.path):
                 # print('Solution not found')
                 return -1
@@ -57,16 +53,16 @@ class DFS(Strategy):
             del self.frontier[-1]
             del self.zeros[-1]
     
-    def is_not_reversed(self, path, move):
-        if path[-1] == 'D' and move == 'U':
-            return False
-        if path[-1] ==  'U' and move == 'D':
-            return False
-        if path[-1] == 'R' and move == 'L':
-            return False
-        if path[-1] == 'L' and move == 'R':
-            return False
-        return True
+#     def is_not_reversed(self, path, move):
+#         if path[-1] == 'D' and move == 'U':
+#             return False
+#         if path[-1] ==  'U' and move == 'D':
+#             return False
+#         if path[-1] == 'R' and move == 'L':
+#             return False
+#         if path[-1] == 'L' and move == 'R':
+#             return False
+#         return True
         
 
 if __name__ == "__main__":
